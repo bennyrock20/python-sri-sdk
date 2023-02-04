@@ -14,9 +14,6 @@ class SRI:
     Class for handling SRI functions
     """
 
-    #         <agenteRetencion>0</agenteRetencion>
-    #         <contribuyenteRimpe>CONTRIBUYENTE RÉGIMEN RIMPE</contribuyenteRimpe>
-
     def __init__(self,
                  environment,
                  type,
@@ -33,6 +30,10 @@ class SRI:
                  serie, number,
                  numeric_code,
                  emission_type,
+                 customer_billing_name,
+                 customer_identification,
+                 customer_identification_type,
+                 customer_address,
                  ):
         """
         @param emission_date: Fecha de emision
@@ -66,6 +67,12 @@ class SRI:
         self.number = number
         self.numeric_code = numeric_code
         self.sequence = sequence
+
+        # Customer information
+        self.customer_billing_name = customer_billing_name
+        self.customer_identification = customer_identification
+        self.customer_identification_type = customer_identification_type
+        self.customer_address = customer_address
 
     def __get_reception_url(self):
         """
@@ -185,19 +192,19 @@ class SRI:
             #         <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
             #         <guiaRemision>000-000-000000000</guiaRemision>
             "tipoIdentificacionComprador": self.customer_identification_type,
-            "razonSocialComprador": self.customer_name,
+            "razonSocialComprador": self.customer_billing_name,
             "identificacionComprador": self.customer_identification,
             "direccionComprador": self.customer_address,
 
             # Total Information
-            "totalSinImpuestos": self.total_without_taxes,
-            "totalDescuento": self.total_discount,
-            "totalConImpuestos": self.total_taxes,
-            "propina": self.propina,
-            "importeTotal": self.total,
-            "moneda": self.currency,
-            "pagos": self.payments,
-            "detalles": self.details,
+            # "totalSinImpuestos": self.total_without_taxes,
+            # "totalDescuento": self.total_discount,
+            # "totalConImpuestos": self.total_taxes,
+            # "propina": self.propina,
+            # "importeTotal": self.total,
+            # "moneda": self.currency,
+            # "pagos": self.payments,
+            # "detalles": self.details,
 
 
         })
