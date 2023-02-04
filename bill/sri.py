@@ -7,91 +7,54 @@ import os
 import zeep
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
+from typing import Set, Tuple, List,Union, Literal
+from pydantic import BaseModel, Field, constr
+from datetime import date, datetime, time, timedelta
+from .enum import  EnvironmentEnum, StatusEnum, ClientTypesEnum, DocumentTypeEnum,EmmisionTypeEnum
 
 
-class SRI:
+class SRI(BaseModel):
     """
     Class for handling SRI functions
     """
+    environment: EnvironmentEnum
+    document_type: DocumentTypeEnum = DocumentTypeEnum.INVOICE
+    billing_name: constr( min_length=3, max_length=300)
+    company_name: constr(min_length=3, max_length=300)
+    company_ruc: constr( min_length=13, max_length=13)
+    establishment: constr(min_length=3, max_length=3)
+    point_emission: constr( min_length=3, max_length=3)
+    company_address: str
+    company_contribuyente_especial: str
+    company_obligado_contabilidad: Literal['SI', 'NO']
+    emission_date:  date
+    serie: constr( min_length=6, max_length=6)
+    sequential: constr(min_length=9, max_length=9)
+    numeric_code:  constr(min_length=8, max_length=8)
+    emission_type: EmmisionTypeEnum = EmmisionTypeEnum.NORMAL
+    customer_billing_name: str
+    customer_identification: str
+    customer_identification_type: DocumentTypeEnum
+    customer_address: str
+    taxes: List[dict]
 
-    def __init__(
-        self,
-        environment,
-        document_type,
-        billing_name,
-        company_name,
-        company_ruc,
-        establishment,
-        point_emission,
-        sequence,
-        company_address,
-        company_contribuyente_especial,
-        company_obligado_contabilidad,
-        emission_date,
-        serie,
-        number,
-        numeric_code,
-        emission_type,
-        customer_billing_name,
-        customer_identification,
-        customer_identification_type,
-        customer_address,
-    ):
-        """
-        @param emission_date: Fecha de emision
-        @param type: Tipo de comprobante
-        @param ruc: RUC del emisor
-        @param environment: Ambiente de trabajo (testing, production)
-        @param serie: Serie del comprobante
-        @param number: Numero del comprobante
-        @param numeric_code: Codigo numerico
-        @param emission_type: Tipo de emision
-        @param verification_digit: Digito de verificacion
-        """
-        # Environment information
-        self.document_type = document_type
-        self.environment = environment == "testing" and "1" or "2"
-        self.emission_type = emission_type
-
-        # Billing information
-        self.company_ruc = company_ruc
-        self.billing_name = billing_name
-        self.company_name = company_name
-        self.company_address = company_address
-        self.establishment = establishment
-        self.point_emission = point_emission
-        self.company_contribuyente_especial = company_contribuyente_especial
-        self.company_obligado_contabilidad = company_obligado_contabilidad
-
-        # Invoice information
-        self.emission_date = emission_date
-        self.serie = serie
-        self.number = number
-        self.numeric_code = numeric_code
-        self.sequence = sequence
-
-        # Customer information
-        self.customer_billing_name = customer_billing_name
-        self.customer_identification = customer_identification
-        self.customer_identification_type = customer_identification_type
-        self.customer_address = customer_address
 
     def __get_reception_url(self):
         """
         Function to get the url of receipt of invoices
         """
-        if self.environment == "1":
+        if self.environment.value == "1":
             return "https://celcer.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantesOffline?wsdl"
-        elif self.environment == "2":
+        elif self.environment.value == "2":
             return "https://cel.sri.gob.ec/comprobantes-electronicos-ws/RecepcionComprobantesOffline?wsdl"
 
     def __get_authorization_url(self):
         """
         Function to get the url of authorization of invoices
         """
-        if self.environment == "testing":
+        if self.environment.value == "testing":
             return "https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl"
-        elif self.environment == "production":
+        elif self.environment.value == "production":
             return "https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl"
 
     def __generate_access_key(self):
@@ -100,16 +63,17 @@ class SRI:
         """
         code_number = str(self.numeric_code).zfill(8)
 
+
         return (
-            str(self.emission_date.replace("/", ""))  # Remove the slashes from the date
-            + str(self.document_type)
+            str(self.emission_date.strftime("%d%m%Y"))
+            + str(self.document_type.value)
             + str(self.company_ruc)
-            + str(self.environment)
+            + str(self.environment.value)
             + str(self.establishment)
             + str(self.point_emission)
-            + str(self.sequence)
+            + str(self.sequential)
             + str(code_number)
-            + str(self.emission_type)
+            + str(self.emission_type.value)
         )
 
     @staticmethod
@@ -167,7 +131,6 @@ class SRI:
                 "serie": self.serie,
                 "razonSocial": self.billing_name,
                 "nombreComercial": self.company_name,
-                "number": self.number,
                 "numeric_code": self.numeric_code,
                 "tipoEmision": self.emission_type,
                 "claveAcceso": access_key,
@@ -192,13 +155,13 @@ class SRI:
                 "importeTotal": 100,
                 "impuestos": [
                     {
-                        "codigo": tax["codigo"],
+                        "codigo": tax["code"],
                         "codigoPorcentaje": tax["codigoPorcentaje"],
                         "descuentoAdicional": tax["descuentoAdicional"],
                         "baseImponible": tax["baseImponible"],
-                        "tarifa": tac["tarifa"],
+                        "tarifa": tax["tarifa"],
                         "valor": tax["valor"],
-                        "valorDevolucionIva": tax["valorDevolucionIva"],
+                        "valorDevolucionIva": tax.get("valorDevolucionIva", 0),
                     }
                     for tax in self.taxes
                 ]

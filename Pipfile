@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 zeep = "*"
 jinja2 = "*"
+pydantic = "*"
 
 [dev-packages]
 pytest = "*"
