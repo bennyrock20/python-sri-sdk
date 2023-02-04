@@ -9,7 +9,7 @@ def main():
     print("Test SRI")
 
     bill = SRI(
-        emission_date="04/02/2023",
+        emission_date="03/02/2023",
         document_type="01",
         environment="testing",
         serie="001",
@@ -19,7 +19,7 @@ def main():
         company_address="Av. 6 de Diciembre y Av. 10 de Agosto",
         number="000000001",
         numeric_code="12345678",
-        company_contribuyente_especial="N/A",
+        company_contribuyente_especial="5368",
         company_obligado_contabilidad="SI",
 
         establishment="001",

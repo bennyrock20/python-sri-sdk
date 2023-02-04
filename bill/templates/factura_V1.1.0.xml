@@ -10,7 +10,7 @@
         <ruc>{{ companyRuc }}</ruc>
         <claveAcceso>{{ claveAcceso }}</claveAcceso>
         <codDoc>01</codDoc>
-        <estab>{{ estab }}</estab>
+        <estab>{{ establecimiento }}</estab>
         <ptoEmi>{{ ptoEmi }}</ptoEmi>
         <secuencial>{{ secuencial }}</secuencial>
         <dirMatriz>{{ dirMatriz }}</dirMatriz>
@@ -32,15 +32,15 @@
 <!--        <paisDestino>{{ paisDestino }}</paisDestino>-->
 <!--        <paisAdquisicion>{{ paisAdquisicion }}</paisAdquisicion>-->
         <tipoIdentificacionComprador>{{ tipoIdentificacionComprador }}</tipoIdentificacionComprador>
-        <guiaRemision>{{ guiaRemision }}</guiaRemision>
+<!--        <guiaRemision>{{ guiaRemision }}</guiaRemision>-->
         <razonSocialComprador>{{razonSocialComprador}}</razonSocialComprador>
         <identificacionComprador>{{ identificacionComprador}}</identificacionComprador>
         <direccionComprador>{{ direccionComprador }}</direccionComprador>
 
-        <totalSinImpuestos>50.00</totalSinImpuestos>
-        <totalSubsidio>50.00</totalSubsidio>
-        <incoTermTotalSinImpuestos>A</incoTermTotalSinImpuestos>
-        <totalDescuento>0.00</totalDescuento>
+        <totalSinImpuestos>{{ totalSinImpuestos }}</totalSinImpuestos>
+<!--        <totalSubsidio>{{ totalSubsidio }}</totalSubsidio>-->
+<!--        <incoTermTotalSinImpuestos>A</incoTermTotalSinImpuestos>-->
+        <totalDescuento>{{ totalDescuento }}</totalDescuento>
 
 <!--        <codDocReembolso>00</codDocReembolso>-->
 <!--        <totalComprobantesReembolso>0</totalComprobantesReembolso>-->
@@ -48,15 +48,18 @@
 <!--        <totalImpuestoReembolso>0</totalImpuestoReembolso>-->
 
         <totalConImpuestos>
+            {% for i in impuestos %}
             <totalImpuesto>
-                <codigo>2</codigo>
-                <codigoPorcentaje>0</codigoPorcentaje>
-                <descuentoAdicional>0.00</descuentoAdicional>
-                <baseImponible>50.00</baseImponible>
-                <tarifa>49.50</tarifa>
-                <valor>50.00</valor>
-                <valorDevolucionIva>50.00</valorDevolucionIva>
+                <codigo>{{ i.codigo }}</codigo>
+                <codigoPorcentaje>{{ i.codigoPorcentaje }}</codigoPorcentaje>
+                <descuentoAdicional>{{ i.descuentoAdicional }}</descuentoAdicional>
+                <baseImponible>{{ i.baseImponible }}</baseImponible>
+                <tarifa>{{ i.tarifa }}</tarifa>
+                <valor>{{ i.valor }}</valor>
+                <valorDevolucionIva>{{  valorDevolucionIva }}</valorDevolucionIva>
             </totalImpuesto>
+            {% endfor %}
+
             <totalImpuesto>
                 <codigo>2</codigo>
                 <codigoPorcentaje>0</codigoPorcentaje>
@@ -80,7 +83,7 @@
 <!--                <valor>50.00</valor>-->
 <!--            </compensacion>-->
 <!--        </compensaciones>-->
-        <propina>0</propina>
+        <propina>{{ propina }}</propina>
 
 <!--        <fleteInternacional>00</fleteInternacional>-->
 <!--        <seguroInternacional>00</seguroInternacional>-->
@@ -240,13 +243,13 @@
 <!--        </retencion>-->
 <!--    </retenciones>-->
     <tipoNegociable>
-        <correo>correo0</correo>
+        <correo>bill@rushdelivery.app</correo>
     </tipoNegociable>
-    <maquinaFiscal>
-        <marca>marca0</marca>
-        <modelo>modelo0</modelo>
-        <serie>serie0</serie>
-    </maquinaFiscal>
+<!--    <maquinaFiscal>-->
+<!--        <marca>marca0</marca>-->
+<!--        <modelo>modelo0</modelo>-->
+<!--        <serie>serie0</serie>-->
+<!--    </maquinaFiscal>-->
 <!--    <infoAdicional>-->
 <!--        <campoAdicional nombre="nombre4">campoAdicional0</campoAdicional>-->
 <!--        <campoAdicional nombre="nombre5">campoAdicional1</campoAdicional>-->

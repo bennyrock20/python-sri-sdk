@@ -159,6 +159,9 @@ class SRI:
         access_key = "{}{}".format(key, digit_verifier)
 
 
+
+
+
         return loader.get_template("factura_V1.1.0.xml").render({
             # Info Tributaria
             "companyRuc": self.company_ruc,
@@ -172,6 +175,8 @@ class SRI:
             "claveAcceso": access_key,
             "dirMatriz": "Calle 1",
             "secuencial": "000000000",
+            "establecimiento": self.establishment,
+            "ptoEmi": self.point_emission,
 
             "dirEstablecimiento": self.company_address,
             "contribuyenteEspecial": self.company_contribuyente_especial,
@@ -180,40 +185,36 @@ class SRI:
             # Info de la factura
 
             "fechaEmision": self.emission_date,
-            # Customer Information
-            # <comercioExterior>{{ comercioExterior  }}</comercioExterior>
-            #         <incoTermFactura>A</incoTermFactura>
-            #         <lugarIncoTerm>lugarIncoTerm0</lugarIncoTerm>
-            #         <paisOrigen>000</paisOrigen>
-            #         <puertoEmbarque>puertoEmbarque0</puertoEmbarque>
-            #         <puertoDestino>puertoDestino0</puertoDestino>
-            #         <paisDestino>000</paisDestino>
-            #         <paisAdquisicion>000</paisAdquisicion>
-            #         <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
-            #         <guiaRemision>000-000-000000000</guiaRemision>
+
             "tipoIdentificacionComprador": self.customer_identification_type,
             "razonSocialComprador": self.customer_billing_name,
             "identificacionComprador": self.customer_identification,
             "direccionComprador": self.customer_address,
 
             # Total Information
-            # "totalSinImpuestos": self.total_without_taxes,
-            # "totalDescuento": self.total_discount,
-            # "totalConImpuestos": self.total_taxes,
-            # "propina": self.propina,
-            # "importeTotal": self.total,
-            # "moneda": self.currency,
-            # "pagos": self.payments,
+            "totalSinImpuestos": 0,
+            "totalDescuento": 0,
+            "totalConImpuestos": 0,
+            "propina": 0,
+            "importeTotal": 100,
+            "impuestos": [
+                {
+                    "codigo": tax["codigo"],
+                    "codigoPorcentaje": tax["codigoPorcentaje"],
+                    "descuentoAdicional": tax["descuentoAdicional"],
+                    "baseImponible": tax["baseImponible"],
+                    "tarifa": tac["tarifa"],
+                    "valor": tax["valor"],
+                    "valorDevolucionIva": tax["valorDevolucionIva"]
+                } for tax in self.taxes
+            ]
+
+            # "pagos": 0,
             # "detalles": self.details,
 
 
         })
 
-    def sign(self):
-        """
-        Function to sign the electronic invoice
-        """
-        pass
 
     def validate_sri(self):
         """
@@ -228,12 +229,19 @@ class SRI:
 
         response = client.service.validarComprobante(xml)
 
-        state = response["estado"]
-        messages = response["comprobantes"]["comprobante"][0]["mensajes"]
+        is_valid = response["estado"] == "RECIBIDA"
 
-        print(messages)
+        if not is_valid:
+            messages = response["comprobantes"]["comprobante"][0]["mensajes"]
+            print(messages)
 
-        return state == "RECIBIDA"
+        return is_valid
+
+    def sign(self):
+        """
+        Function to sign the electronic invoice
+        """
+        pass
 
     def get_authorization(self):
         """
