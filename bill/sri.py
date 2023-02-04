@@ -14,27 +14,29 @@ class SRI:
     Class for handling SRI functions
     """
 
-    def __init__(self,
-                 environment,
-                 document_type,
-                 billing_name,
-                 company_name,
-                 company_ruc,
-                 establishment,
-                 point_emission,
-                 sequence,
-                 company_address,
-                 company_contribuyente_especial,
-                 company_obligado_contabilidad,
-                 emission_date,
-                 serie, number,
-                 numeric_code,
-                 emission_type,
-                 customer_billing_name,
-                 customer_identification,
-                 customer_identification_type,
-                 customer_address,
-                 ):
+    def __init__(
+        self,
+        environment,
+        document_type,
+        billing_name,
+        company_name,
+        company_ruc,
+        establishment,
+        point_emission,
+        sequence,
+        company_address,
+        company_contribuyente_especial,
+        company_obligado_contabilidad,
+        emission_date,
+        serie,
+        number,
+        numeric_code,
+        emission_type,
+        customer_billing_name,
+        customer_identification,
+        customer_identification_type,
+        customer_address,
+    ):
         """
         @param emission_date: Fecha de emision
         @param type: Tipo de comprobante
@@ -94,20 +96,20 @@ class SRI:
 
     def __generate_access_key(self):
         """
-       Function to generate the access key
+        Function to generate the access key
         """
         code_number = str(self.numeric_code).zfill(8)
 
         return (
-                str(self.emission_date.replace("/", ""))  # Remove the slashes from the date
-                + str(self.document_type)
-                + str(self.company_ruc)
-                + str(self.environment)
-                + str(self.establishment)
-                + str(self.point_emission)
-                + str(self.sequence)
-                + str(code_number)
-                + str(self.emission_type)
+            str(self.emission_date.replace("/", ""))  # Remove the slashes from the date
+            + str(self.document_type)
+            + str(self.company_ruc)
+            + str(self.environment)
+            + str(self.establishment)
+            + str(self.point_emission)
+            + str(self.sequence)
+            + str(code_number)
+            + str(self.emission_type)
         )
 
     @staticmethod
@@ -123,7 +125,7 @@ class SRI:
 
         while x > 0:
             x = x - 1
-            number = int(key[x: x + 1])
+            number = int(key[x : x + 1])
             total = total + (number * factor)
 
             if factor == 7:
@@ -148,8 +150,7 @@ class SRI:
         """
 
         loader = Environment(
-            loader=PackageLoader("bill", "templates"),
-            autoescape=select_autoescape()
+            loader=PackageLoader("bill", "templates"), autoescape=select_autoescape()
         )
         # Generate access key
         key = self.__generate_access_key()
@@ -158,63 +159,53 @@ class SRI:
 
         access_key = "{}{}".format(key, digit_verifier)
 
-
-
-
-
-        return loader.get_template("factura_V1.1.0.xml").render({
-            # Info Tributaria
-            "companyRuc": self.company_ruc,
-            "environment": self.environment,
-            "serie": self.serie,
-            "razonSocial": self.billing_name,
-            "nombreComercial": self.company_name,
-            "number": self.number,
-            "numeric_code": self.numeric_code,
-            "tipoEmision": self.emission_type,
-            "claveAcceso": access_key,
-            "dirMatriz": "Calle 1",
-            "secuencial": "000000000",
-            "establecimiento": self.establishment,
-            "ptoEmi": self.point_emission,
-
-            "dirEstablecimiento": self.company_address,
-            "contribuyenteEspecial": self.company_contribuyente_especial,
-            "obligadoContabilidad": self.company_obligado_contabilidad,
-
-            # Info de la factura
-
-            "fechaEmision": self.emission_date,
-
-            "tipoIdentificacionComprador": self.customer_identification_type,
-            "razonSocialComprador": self.customer_billing_name,
-            "identificacionComprador": self.customer_identification,
-            "direccionComprador": self.customer_address,
-
-            # Total Information
-            "totalSinImpuestos": 0,
-            "totalDescuento": 0,
-            "totalConImpuestos": 0,
-            "propina": 0,
-            "importeTotal": 100,
-            "impuestos": [
-                {
-                    "codigo": tax["codigo"],
-                    "codigoPorcentaje": tax["codigoPorcentaje"],
-                    "descuentoAdicional": tax["descuentoAdicional"],
-                    "baseImponible": tax["baseImponible"],
-                    "tarifa": tac["tarifa"],
-                    "valor": tax["valor"],
-                    "valorDevolucionIva": tax["valorDevolucionIva"]
-                } for tax in self.taxes
-            ]
-
-            # "pagos": 0,
-            # "detalles": self.details,
-
-
-        })
-
+        return loader.get_template("factura_V1.1.0.xml").render(
+            {
+                # Info Tributaria
+                "companyRuc": self.company_ruc,
+                "environment": self.environment,
+                "serie": self.serie,
+                "razonSocial": self.billing_name,
+                "nombreComercial": self.company_name,
+                "number": self.number,
+                "numeric_code": self.numeric_code,
+                "tipoEmision": self.emission_type,
+                "claveAcceso": access_key,
+                "dirMatriz": "Calle 1",
+                "secuencial": "000000000",
+                "establecimiento": self.establishment,
+                "ptoEmi": self.point_emission,
+                "dirEstablecimiento": self.company_address,
+                "contribuyenteEspecial": self.company_contribuyente_especial,
+                "obligadoContabilidad": self.company_obligado_contabilidad,
+                # Info de la factura
+                "fechaEmision": self.emission_date,
+                "tipoIdentificacionComprador": self.customer_identification_type,
+                "razonSocialComprador": self.customer_billing_name,
+                "identificacionComprador": self.customer_identification,
+                "direccionComprador": self.customer_address,
+                # Total Information
+                "totalSinImpuestos": 0,
+                "totalDescuento": 0,
+                "totalConImpuestos": 0,
+                "propina": 0,
+                "importeTotal": 100,
+                "impuestos": [
+                    {
+                        "codigo": tax["codigo"],
+                        "codigoPorcentaje": tax["codigoPorcentaje"],
+                        "descuentoAdicional": tax["descuentoAdicional"],
+                        "baseImponible": tax["baseImponible"],
+                        "tarifa": tac["tarifa"],
+                        "valor": tax["valor"],
+                        "valorDevolucionIva": tax["valorDevolucionIva"],
+                    }
+                    for tax in self.taxes
+                ]
+                # "pagos": 0,
+                # "detalles": self.details,
+            }
+        )
 
     def validate_sri(self):
         """
