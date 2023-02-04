@@ -10,10 +10,10 @@ def main():
 
     bill = SRI(
         emission_date="04/02/2023",
-        type="1",
+        document_type="01",
         environment="testing",
         serie="001",
-        company_ruc="1792146739001",
+        company_ruc="0105527386001",
         billing_name="Distribuidora de Suministros Nacional S.A.",
         company_name="Empresa Importadora y Exportadora de Piezas",
         company_address="Av. 6 de Diciembre y Av. 10 de Agosto",

@@ -4,7 +4,7 @@
  xsi:noNamespaceSchemaLocation="file:/C:/borrar/xsd/10-xsd-1_V1.1.0.xsd" id="comprobante" version="1.1.0">
        <infoTributaria>
         <ambiente>{{ environment }}</ambiente>
-        <tipoEmision>{{ type }}</tipoEmision>
+        <tipoEmision>{{ tipoEmision }}</tipoEmision>
         <razonSocial>{{ razonSocial}}</razonSocial>
         <nombreComercial>{{ nombreComercial}}</nombreComercial>
         <ruc>{{ companyRuc }}</ruc>

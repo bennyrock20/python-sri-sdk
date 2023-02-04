@@ -16,7 +16,7 @@ class SRI:
 
     def __init__(self,
                  environment,
-                 type,
+                 document_type,
                  billing_name,
                  company_name,
                  company_ruc,
@@ -47,7 +47,7 @@ class SRI:
         @param verification_digit: Digito de verificacion
         """
         # Environment information
-        self.type = type
+        self.document_type = document_type
         self.environment = environment == "testing" and "1" or "2"
         self.emission_type = emission_type
 
@@ -100,7 +100,7 @@ class SRI:
 
         return (
                 str(self.emission_date.replace("/", ""))  # Remove the slashes from the date
-                + str(self.type)
+                + str(self.document_type)
                 + str(self.company_ruc)
                 + str(self.environment)
                 + str(self.establishment)
@@ -158,9 +158,9 @@ class SRI:
 
         access_key = "{}{}".format(key, digit_verifier)
 
+
         return loader.get_template("factura_V1.1.0.xml").render({
             # Info Tributaria
-            "type": self.type,
             "companyRuc": self.company_ruc,
             "environment": self.environment,
             "serie": self.serie,
@@ -168,7 +168,7 @@ class SRI:
             "nombreComercial": self.company_name,
             "number": self.number,
             "numeric_code": self.numeric_code,
-            "emission_type": self.emission_type,
+            "tipoEmision": self.emission_type,
             "claveAcceso": access_key,
             "dirMatriz": "Calle 1",
             "secuencial": "000000000",
