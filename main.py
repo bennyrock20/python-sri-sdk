@@ -38,11 +38,20 @@ def main():
                 "value": "12",
             },
         ],
+        payments=[
+            {
+                "payment_method": "01",
+                "total": "112",
+                "terms": 0,
+                "unit_time": "dias",
+            },
+        ],
     )
 
     # Test Validation
+    from pprint import pprint
 
-    assert bill.get_xml()
+    pprint(bill.get_xml())
 
 
 if __name__ == "__main__":

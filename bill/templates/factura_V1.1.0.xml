@@ -50,25 +50,15 @@
         <totalConImpuestos>
             {% for i in impuestos %}
             <totalImpuesto>
-                <codigo>{{ i.codigo }}</codigo>
-                <codigoPorcentaje>{{ i.codigoPorcentaje }}</codigoPorcentaje>
-                <descuentoAdicional>{{ i.descuentoAdicional }}</descuentoAdicional>
-                <baseImponible>{{ i.baseImponible }}</baseImponible>
-                <tarifa>{{ i.tarifa }}</tarifa>
-                <valor>{{ i.valor }}</valor>
-                <valorDevolucionIva>{{  valorDevolucionIva }}</valorDevolucionIva>
+                <codigo>{{ i.code.value }}</codigo>
+                <codigoPorcentaje>{{ i.code_parcentage_tax }}</codigoPorcentaje>
+                <descuentoAdicional>{{ i.additional_discount }}</descuentoAdicional>
+                <baseImponible>{{ i.base }}</baseImponible>
+<!--                <tarifa>{{ i.tarifa }}</tarifa>-->
+                <valor>{{ i.value }}</valor>
+<!--                <valorDevolucionIva>{{  valorDevolucionIva }}</valorDevolucionIva>-->
             </totalImpuesto>
             {% endfor %}
-
-            <totalImpuesto>
-                <codigo>2</codigo>
-                <codigoPorcentaje>0</codigoPorcentaje>
-                <descuentoAdicional>0.00</descuentoAdicional>
-                <baseImponible>50.00</baseImponible>
-                <tarifa>49.50</tarifa>
-                <valor>50.00</valor>
-                <valorDevolucionIva>50.00</valorDevolucionIva>
-            </totalImpuesto>
         </totalConImpuestos>
 
 <!--        <compensaciones>-->
@@ -96,21 +86,18 @@
 <!--        <placa>placa0</placa>-->
 
         <pagos>
+
+            {% for i in pagos %}
             <pago>
-                <formaPago>01</formaPago>
-                <total>50.00</total>
-                <plazo>50.00</plazo>
-                <unidadTiempo>unidadTiem</unidadTiempo>
+                <formaPago>{{ i.payment_method.value }}</formaPago>
+                <total>{{ i.total }}</total>
+                <plazo>{{ i.terms }}</plazo>
+                <unidadTiempo>{{ i.unit_time.value }}</unidadTiempo>
             </pago>
-            <pago>
-                <formaPago>01</formaPago>
-                <total>50.00</total>
-                <plazo>50.00</plazo>
-                <unidadTiempo>unidadTiem</unidadTiempo>
-            </pago>
+            {% endfor %}
         </pagos>
-        <valorRetIva>50.00</valorRetIva>
-        <valorRetRenta>50.00</valorRetRenta>
+<!--        <valorRetIva>50.00</valorRetIva>-->
+<!--        <valorRetRenta>50.00</valorRetRenta>-->
     </infoFactura>
     <detalles>
         <detalle>

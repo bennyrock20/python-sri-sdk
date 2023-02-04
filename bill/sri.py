@@ -18,6 +18,8 @@ from .enum import (
     EmmisionTypeEnum,
     TaxCodeEnum,
     PercentageTaxCodeEnum,
+    UnitTimeEnum,
+    PaymentMethodEnum,
 )
 
 
@@ -31,6 +33,25 @@ class TaxItem(BaseModel):
     additional_discount: str
     base: str
     value: str
+
+
+#  <pago>
+#                 <formaPago>01</formaPago>
+#                 <total>50.00</total>
+#                 <plazo>50.00</plazo>
+#                 <unidadTiempo>unidadTiem</unidadTiempo>
+#             </pago>
+
+
+class PaymentItem(BaseModel):
+    """
+    Class for handling payment items
+    """
+
+    payment_method: PaymentMethodEnum
+    total: str
+    terms: int
+    unit_time: UnitTimeEnum
 
 
 class SRI(BaseModel):
@@ -58,6 +79,7 @@ class SRI(BaseModel):
     customer_identification_type: DocumentTypeEnum
     customer_address: str
     taxes: List[TaxItem]
+    payments: List[PaymentItem]
 
     def __get_reception_url(self):
         """
@@ -172,16 +194,8 @@ class SRI(BaseModel):
                 "totalConImpuestos": 0,
                 "propina": 0,
                 "importeTotal": 100,
-                "impuestos": [
-                    {
-                        "codigo": item.code,
-                        "codigoPorcentaje": item.tax_percentage_code,
-                        "descuentoAdicional": item.additional_discount,
-                        "baseImponible": item.base,
-                        "valor": item.value,
-                    }
-                    for item in self.taxes
-                ],
+                "impuestos": self.taxes,
+                "pagos": self.payments,
             }
         )
 

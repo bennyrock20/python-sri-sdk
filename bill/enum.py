@@ -44,3 +44,18 @@ class PercentageTaxCodeEnum(str, Enum):
     FOURTEEN = "3"
     NO_TAX = "6"
     TAX_EXEMPT = "7"
+
+
+class PaymentMethodEnum(str, Enum):
+    CASH = "01"
+    DEBT_COMPENSATION = "15"
+    DEBIT_CARD = "16"
+    ELECTRONIC_MONEY = "17"
+    PREPAID_CARD = "18"
+    CREDIT_CARD = "19"
+    OTHERS = "20"
+    ENDORSEMENT = "21"
+
+
+class UnitTimeEnum(str, Enum):
+    DAY = "dias"
