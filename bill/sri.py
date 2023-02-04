@@ -7,37 +7,57 @@ import os
 import zeep
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
-from typing import Set, Tuple, List,Union, Literal
+from typing import Set, Tuple, List, Union, Literal
 from pydantic import BaseModel, Field, constr
 from datetime import date, datetime, time, timedelta
-from .enum import  EnvironmentEnum, StatusEnum, ClientTypesEnum, DocumentTypeEnum,EmmisionTypeEnum
+from .enum import (
+    EnvironmentEnum,
+    StatusEnum,
+    ClientTypesEnum,
+    DocumentTypeEnum,
+    EmmisionTypeEnum,
+    TaxCodeEnum,
+    PercentageTaxCodeEnum,
+)
+
+
+class TaxItem(BaseModel):
+    """
+    Class for handling tax items
+    """
+
+    code: TaxCodeEnum
+    tax_percentage_code: PercentageTaxCodeEnum
+    additional_discount: str
+    base: str
+    value: str
 
 
 class SRI(BaseModel):
     """
     Class for handling SRI functions
     """
+
     environment: EnvironmentEnum
     document_type: DocumentTypeEnum = DocumentTypeEnum.INVOICE
-    billing_name: constr( min_length=3, max_length=300)
+    billing_name: constr(min_length=3, max_length=300)
     company_name: constr(min_length=3, max_length=300)
-    company_ruc: constr( min_length=13, max_length=13)
+    company_ruc: constr(min_length=13, max_length=13)
     establishment: constr(min_length=3, max_length=3)
-    point_emission: constr( min_length=3, max_length=3)
+    point_emission: constr(min_length=3, max_length=3)
     company_address: str
     company_contribuyente_especial: str
-    company_obligado_contabilidad: Literal['SI', 'NO']
-    emission_date:  date
-    serie: constr( min_length=6, max_length=6)
+    company_obligado_contabilidad: Literal["SI", "NO"]
+    emission_date: date
+    serie: constr(min_length=6, max_length=6)
     sequential: constr(min_length=9, max_length=9)
-    numeric_code:  constr(min_length=8, max_length=8)
+    numeric_code: constr(min_length=8, max_length=8)
     emission_type: EmmisionTypeEnum = EmmisionTypeEnum.NORMAL
     customer_billing_name: str
     customer_identification: str
     customer_identification_type: DocumentTypeEnum
     customer_address: str
-    taxes: List[dict]
-
+    taxes: List[TaxItem]
 
     def __get_reception_url(self):
         """
@@ -62,7 +82,6 @@ class SRI(BaseModel):
         Function to generate the access key
         """
         code_number = str(self.numeric_code).zfill(8)
-
 
         return (
             str(self.emission_date.strftime("%d%m%Y"))
@@ -155,18 +174,14 @@ class SRI(BaseModel):
                 "importeTotal": 100,
                 "impuestos": [
                     {
-                        "codigo": tax["code"],
-                        "codigoPorcentaje": tax["codigoPorcentaje"],
-                        "descuentoAdicional": tax["descuentoAdicional"],
-                        "baseImponible": tax["baseImponible"],
-                        "tarifa": tax["tarifa"],
-                        "valor": tax["valor"],
-                        "valorDevolucionIva": tax.get("valorDevolucionIva", 0),
+                        "codigo": item.code,
+                        "codigoPorcentaje": item.tax_percentage_code,
+                        "descuentoAdicional": item.additional_discount,
+                        "baseImponible": item.base,
+                        "valor": item.value,
                     }
-                    for tax in self.taxes
-                ]
-                # "pagos": 0,
-                # "detalles": self.details,
+                    for item in self.taxes
+                ],
             }
         )
 

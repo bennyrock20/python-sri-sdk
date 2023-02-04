@@ -1,6 +1,7 @@
 from bill.sri import SRI
 from datetime import date
 
+
 def main():
     """
     Test SRI
@@ -31,8 +32,9 @@ def main():
         taxes=[
             {
                 "code": "2",
-                "tax": "12",
+                "tax_percentage_code": "2",
                 "base": "100",
+                "additional_discount": "0",
                 "value": "12",
             },
         ],
