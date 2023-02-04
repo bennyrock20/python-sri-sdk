@@ -3,8 +3,8 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="file:/C:/borrar/xsd/10-xsd-1_V1.1.0.xsd" id="comprobante" version="1.1.0">
        <infoTributaria>
-        <ambiente>{{ environment }}</ambiente>
-        <tipoEmision>{{ tipoEmision }}</tipoEmision>
+        <ambiente>{{ environment.value }}</ambiente>
+        <tipoEmision>{{ tipoEmision.value }}</tipoEmision>
         <razonSocial>{{ razonSocial}}</razonSocial>
         <nombreComercial>{{ nombreComercial}}</nombreComercial>
         <ruc>{{ companyRuc }}</ruc>
@@ -15,7 +15,6 @@
         <secuencial>{{ secuencial }}</secuencial>
         <dirMatriz>{{ dirMatriz }}</dirMatriz>
         <agenteRetencion>0</agenteRetencion>
-        <contribuyenteRimpe>CONTRIBUYENTE RÉGIMEN RIMPE</contribuyenteRimpe>
     </infoTributaria>
 
     <infoFactura>
@@ -23,70 +22,32 @@
         <dirEstablecimiento>{{ dirEstablecimiento }}</dirEstablecimiento>
         <contribuyenteEspecial>{{ contribuyenteEspecial }}</contribuyenteEspecial>
         <obligadoContabilidad>{{ obligadoContabilidad }}</obligadoContabilidad>
-<!--        <comercioExterior>{{ comercioExterior  }}</comercioExterior>-->
-<!--        <incoTermFactura>{{ incoTermFactura }}</incoTermFactura>-->
-<!--        <lugarIncoTerm>{{ lugarIncoTerm }}</lugarIncoTerm>-->
-<!--        <paisOrigen>{{ paisOrigen }}</paisOrigen>-->
-<!--        <puertoEmbarque>{{puertoEmbarque}}</puertoEmbarque>-->
-<!--        <puertoDestino>{{puertoDestino}}</puertoDestino>-->
-<!--        <paisDestino>{{ paisDestino }}</paisDestino>-->
-<!--        <paisAdquisicion>{{ paisAdquisicion }}</paisAdquisicion>-->
-        <tipoIdentificacionComprador>{{ tipoIdentificacionComprador }}</tipoIdentificacionComprador>
-<!--        <guiaRemision>{{ guiaRemision }}</guiaRemision>-->
+
+        <tipoIdentificacionComprador>{{ tipoIdentificacionComprador.value }}</tipoIdentificacionComprador>
         <razonSocialComprador>{{razonSocialComprador}}</razonSocialComprador>
         <identificacionComprador>{{ identificacionComprador}}</identificacionComprador>
         <direccionComprador>{{ direccionComprador }}</direccionComprador>
 
         <totalSinImpuestos>{{ totalSinImpuestos }}</totalSinImpuestos>
-<!--        <totalSubsidio>{{ totalSubsidio }}</totalSubsidio>-->
-<!--        <incoTermTotalSinImpuestos>A</incoTermTotalSinImpuestos>-->
         <totalDescuento>{{ totalDescuento }}</totalDescuento>
 
-<!--        <codDocReembolso>00</codDocReembolso>-->
-<!--        <totalComprobantesReembolso>0</totalComprobantesReembolso>-->
-<!--        <totalBaseImponibleReembolso>0</totalBaseImponibleReembolso>-->
-<!--        <totalImpuestoReembolso>0</totalImpuestoReembolso>-->
 
         <totalConImpuestos>
             {% for i in impuestos %}
             <totalImpuesto>
                 <codigo>{{ i.code.value }}</codigo>
-                <codigoPorcentaje>{{ i.code_parcentage_tax }}</codigoPorcentaje>
+                <codigoPorcentaje>{{ i.tax_percentage_code.value }}</codigoPorcentaje>
                 <descuentoAdicional>{{ i.additional_discount }}</descuentoAdicional>
                 <baseImponible>{{ i.base }}</baseImponible>
-<!--                <tarifa>{{ i.tarifa }}</tarifa>-->
                 <valor>{{ i.value }}</valor>
-<!--                <valorDevolucionIva>{{  valorDevolucionIva }}</valorDevolucionIva>-->
             </totalImpuesto>
             {% endfor %}
         </totalConImpuestos>
 
-<!--        <compensaciones>-->
-<!--            <compensacion>-->
-<!--                <codigo>1</codigo>-->
-<!--                <tarifa>49.50</tarifa>-->
-<!--                <valor>50.00</valor>-->
-<!--            </compensacion>-->
-<!--            <compensacion>-->
-<!--                <codigo>1</codigo>-->
-<!--                <tarifa>49.50</tarifa>-->
-<!--                <valor>50.00</valor>-->
-<!--            </compensacion>-->
-<!--        </compensaciones>-->
         <propina>{{ propina }}</propina>
-
-<!--        <fleteInternacional>00</fleteInternacional>-->
-<!--        <seguroInternacional>00</seguroInternacional>-->
-<!--        <gastosAduaneros>00</gastosAduaneros>-->
-<!--        <gastosTransporteOtros>00</gastosTransporteOtros>-->
-
         <importeTotal>{{ importeTotal }} </importeTotal>
         <moneda>DOLAR</moneda>
-
-<!--        <placa>placa0</placa>-->
-
         <pagos>
-
             {% for i in pagos %}
             <pago>
                 <formaPago>{{ i.payment_method.value }}</formaPago>
@@ -96,8 +57,6 @@
             </pago>
             {% endfor %}
         </pagos>
-<!--        <valorRetIva>50.00</valorRetIva>-->
-<!--        <valorRetRenta>50.00</valorRetRenta>-->
     </infoFactura>
     <detalles>
 
@@ -105,21 +64,17 @@
 
         <detalle>
             <codigoPrincipal>{{ i.code }}</codigoPrincipal>
-            <codigoAuxiliar>{{ i.code_aux }}</codigoAuxiliar>
+            <codigoAuxiliar>{{ i.aux_code }}</codigoAuxiliar>
             <descripcion>{{ i.description }}</descripcion>
             <cantidad>{{ i.quantity }}</cantidad>
             <precioUnitario>{{ i.unit_price }}</precioUnitario>
             <descuento>{{ i.discount }}</descuento>
-            <precioTotalSinImpuesto>{{ i.total_price }}</precioTotalSinImpuesto>
-<!--            <detallesAdicionales>-->
-<!--                <detAdicional nombre="nombre0" valor="valor0"/>-->
-<!--                <detAdicional nombre="nombre1" valor="valor1"/>-->
-<!--            </detallesAdicionales>-->
+            <precioTotalSinImpuesto>{{ i.price_total_without_tax }}</precioTotalSinImpuesto>
             <impuestos>
                 {% for j in i.taxes %}
                 <impuesto>
                     <codigo>{{ j.code.value }}</codigo>
-                    <codigoPorcentaje>{{ j.code_parcentage_tax }}</codigoPorcentaje>
+                    <codigoPorcentaje>{{ j.tax_percentage_code.value }}</codigoPorcentaje>
                     <tarifa>{{ j.tarifa }}</tarifa>
                     <baseImponible>{{ j.base }}</baseImponible>
                     <valor>{{ j.value }}</valor>
@@ -129,142 +84,8 @@
         </detalle>
 
         {% endfor %}
-        <detalle>
-            <codigoPrincipal>codigoPrincipal0</codigoPrincipal>
-            <codigoAuxiliar>codigoAuxiliar0</codigoAuxiliar>
-            <descripcion>descripcion0</descripcion>
-            <unidadMedida>unidadMedida0</unidadMedida>
-            <cantidad>50.000000</cantidad>
-            <precioUnitario>50.000000</precioUnitario>
-            <precioSinSubsidio>50.000000</precioSinSubsidio>
-            <descuento>50.00</descuento>
-            <precioTotalSinImpuesto>50.00</precioTotalSinImpuesto>
-
-            <impuestos>
-                <impuesto>
-                    <codigo>2</codigo>
-                    <codigoPorcentaje>0</codigoPorcentaje>
-                    <tarifa>49.50</tarifa>
-                    <baseImponible>50.00</baseImponible>
-                    <valor>50.00</valor>
-                </impuesto>
-                <impuesto>
-                    <codigo>2</codigo>
-                    <codigoPorcentaje>0</codigoPorcentaje>
-                    <tarifa>49.50</tarifa>
-                    <baseImponible>50.00</baseImponible>
-                    <valor>50.00</valor>
-                </impuesto>
-            </impuestos>
-        </detalle>
     </detalles>
-<!--    <reembolsos>-->
-<!--        <reembolsoDetalle>-->
-<!--            <tipoIdentificacionProveedorReembolso>04</tipoIdentificacionProveedorReembolso>-->
-<!--            <identificacionProveedorReembolso>identificacionProvee</identificacionProveedorReembolso>-->
-<!--            <codPaisPagoProveedorReembolso>000</codPaisPagoProveedorReembolso>-->
-<!--            <tipoProveedorReembolso>01</tipoProveedorReembolso>-->
-<!--            <codDocReembolso>00</codDocReembolso>-->
-<!--            <estabDocReembolso>000</estabDocReembolso>-->
-<!--            <ptoEmiDocReembolso>000</ptoEmiDocReembolso>-->
-<!--            <secuencialDocReembolso>000000000</secuencialDocReembolso>-->
-<!--            <fechaEmisionDocReembolso>01/01/2000</fechaEmisionDocReembolso>-->
-<!--            <numeroautorizacionDocReemb>0000000000</numeroautorizacionDocReemb>-->
-<!--            <detalleImpuestos>-->
-<!--                <detalleImpuesto>-->
-<!--                    <codigo>2</codigo>-->
-<!--                    <codigoPorcentaje>0</codigoPorcentaje>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <baseImponibleReembolso>50.00</baseImponibleReembolso>-->
-<!--                    <impuestoReembolso>50.00</impuestoReembolso>-->
-<!--                </detalleImpuesto>-->
-<!--                <detalleImpuesto>-->
-<!--                    <codigo>2</codigo>-->
-<!--                    <codigoPorcentaje>0</codigoPorcentaje>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <baseImponibleReembolso>50.00</baseImponibleReembolso>-->
-<!--                    <impuestoReembolso>50.00</impuestoReembolso>-->
-<!--                </detalleImpuesto>-->
-<!--            </detalleImpuestos>-->
-<!--            <compensacionesReembolso>-->
-<!--                <compensacionReembolso>-->
-<!--                    <codigo>1</codigo>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <valor>50.00</valor>-->
-<!--                </compensacionReembolso>-->
-<!--                <compensacionReembolso>-->
-<!--                    <codigo>1</codigo>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <valor>50.00</valor>-->
-<!--                </compensacionReembolso>-->
-<!--            </compensacionesReembolso>-->
-<!--        </reembolsoDetalle>-->
-<!--        <reembolsoDetalle>-->
-<!--            <tipoIdentificacionProveedorReembolso>04</tipoIdentificacionProveedorReembolso>-->
-<!--            <identificacionProveedorReembolso>identificacionProvee</identificacionProveedorReembolso>-->
-<!--            <codPaisPagoProveedorReembolso>000</codPaisPagoProveedorReembolso>-->
-<!--            <tipoProveedorReembolso>01</tipoProveedorReembolso>-->
-<!--            <codDocReembolso>00</codDocReembolso>-->
-<!--            <estabDocReembolso>000</estabDocReembolso>-->
-<!--            <ptoEmiDocReembolso>000</ptoEmiDocReembolso>-->
-<!--            <secuencialDocReembolso>000000000</secuencialDocReembolso>-->
-<!--            <fechaEmisionDocReembolso>01/01/2000</fechaEmisionDocReembolso>-->
-<!--            <numeroautorizacionDocReemb>0000000000</numeroautorizacionDocReemb>-->
-<!--            <detalleImpuestos>-->
-<!--                <detalleImpuesto>-->
-<!--                    <codigo>2</codigo>-->
-<!--                    <codigoPorcentaje>0</codigoPorcentaje>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <baseImponibleReembolso>50.00</baseImponibleReembolso>-->
-<!--                    <impuestoReembolso>50.00</impuestoReembolso>-->
-<!--                </detalleImpuesto>-->
-<!--                <detalleImpuesto>-->
-<!--                    <codigo>2</codigo>-->
-<!--                    <codigoPorcentaje>0</codigoPorcentaje>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <baseImponibleReembolso>50.00</baseImponibleReembolso>-->
-<!--                    <impuestoReembolso>50.00</impuestoReembolso>-->
-<!--                </detalleImpuesto>-->
-<!--            </detalleImpuestos>-->
-<!--            <compensacionesReembolso>-->
-<!--                <compensacionReembolso>-->
-<!--                    <codigo>1</codigo>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <valor>50.00</valor>-->
-<!--                </compensacionReembolso>-->
-<!--                <compensacionReembolso>-->
-<!--                    <codigo>1</codigo>-->
-<!--                    <tarifa>49.50</tarifa>-->
-<!--                    <valor>50.00</valor>-->
-<!--                </compensacionReembolso>-->
-<!--            </compensacionesReembolso>-->
-<!--        </reembolsoDetalle>-->
-<!--    </reembolsos>-->
-
-<!--    <retenciones>-->
-<!--        <retencion>-->
-<!--            <codigo>4</codigo>-->
-<!--            <codigoPorcentaje>0</codigoPorcentaje>-->
-<!--            <tarifa>499.50</tarifa>-->
-<!--            <valor>50.00</valor>-->
-<!--        </retencion>-->
-<!--        <retencion>-->
-<!--            <codigo>4</codigo>-->
-<!--            <codigoPorcentaje>0</codigoPorcentaje>-->
-<!--            <tarifa>499.50</tarifa>-->
-<!--            <valor>50.00</valor>-->
-<!--        </retencion>-->
-<!--    </retenciones>-->
     <tipoNegociable>
         <correo>bill@rushdelivery.app</correo>
     </tipoNegociable>
-<!--    <maquinaFiscal>-->
-<!--        <marca>marca0</marca>-->
-<!--        <modelo>modelo0</modelo>-->
-<!--        <serie>serie0</serie>-->
-<!--    </maquinaFiscal>-->
-<!--    <infoAdicional>-->
-<!--        <campoAdicional nombre="nombre4">campoAdicional0</campoAdicional>-->
-<!--        <campoAdicional nombre="nombre5">campoAdicional1</campoAdicional>-->
-<!--    </infoAdicional>-->
 </factura>

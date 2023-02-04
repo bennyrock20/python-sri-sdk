@@ -13,13 +13,13 @@ from datetime import date, datetime, time, timedelta
 from .enum import (
     EnvironmentEnum,
     StatusEnum,
-    ClientTypesEnum,
     DocumentTypeEnum,
     EmmisionTypeEnum,
     TaxCodeEnum,
     PercentageTaxCodeEnum,
     UnitTimeEnum,
     PaymentMethodEnum,
+    IdentificationTypeEnum,
 )
 
 
@@ -31,6 +31,7 @@ class TaxItem(BaseModel):
     code: TaxCodeEnum
     tax_percentage_code: PercentageTaxCodeEnum
     additional_discount: str
+    tarifa: str
     base: str
     value: str
 
@@ -46,28 +47,6 @@ class PaymentItem(BaseModel):
     unit_time: UnitTimeEnum
 
 
-#       <detalle>
-#             <detallesAdicionales>
-#                 <detAdicional nombre="nombre0" valor="valor0"/>
-#                 <detAdicional nombre="nombre1" valor="valor1"/>
-#             </detallesAdicionales>
-#             <impuestos>
-#                 <impuesto>
-#                     <codigo>2</codigo>
-#                     <codigoPorcentaje>0</codigoPorcentaje>
-#                     <tarifa>49.50</tarifa>
-#                     <baseImponible>50.00</baseImponible>
-#                     <valor>50.00</valor>
-#                 </impuesto>
-#                 <impuesto>
-#                     <codigo>2</codigo>
-#                     <codigoPorcentaje>0</codigoPorcentaje>
-#                     <tarifa>49.50</tarifa>
-#                     <baseImponible>50.00</baseImponible>
-#                     <valor>50.00</valor>
-#                 </impuesto>
-#             </impuestos>
-#         </detalle>
 class LineItem(BaseModel):
     """
     Class for handling line items
@@ -105,7 +84,7 @@ class SRI(BaseModel):
     emission_type: EmmisionTypeEnum = EmmisionTypeEnum.NORMAL
     customer_billing_name: str
     customer_identification: str
-    customer_identification_type: DocumentTypeEnum
+    customer_identification_type: IdentificationTypeEnum
     customer_address: str
     taxes: List[TaxItem]
     payments: List[PaymentItem]
@@ -213,7 +192,7 @@ class SRI(BaseModel):
                 "contribuyenteEspecial": self.company_contribuyente_especial,
                 "obligadoContabilidad": self.company_obligado_contabilidad,
                 # Info de la factura
-                "fechaEmision": self.emission_date,
+                "fechaEmision": self.emission_date.strftime("%d/%m/%Y"),
                 "tipoIdentificacionComprador": self.customer_identification_type,
                 "razonSocialComprador": self.customer_billing_name,
                 "identificacionComprador": self.customer_identification,

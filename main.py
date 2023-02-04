@@ -27,13 +27,14 @@ def main():
         sequential="000000001",
         customer_billing_name="Cliente",
         customer_identification="1792146739001",
-        customer_identification_type="01",
+        customer_identification_type="04",
         customer_address="Av. 6 de Diciembre y Av. 10 de Agosto",
         taxes=[
             {
                 "code": "2",
                 "tax_percentage_code": "2",
                 "base": "100",
+                "tarifa": "12",
                 "additional_discount": "0",
                 "value": "12",
             },
@@ -49,7 +50,7 @@ def main():
         lines_items=[
             {
                 "code": "0001",
-                "aux_code": "0001",
+                "aux_code": "ABC-2343",
                 "description": "Producto 1",
                 "quantity": "1",
                 "unit_price": "100",
@@ -60,6 +61,7 @@ def main():
                         "code": "2",
                         "tax_percentage_code": "2",
                         "base": "100",
+                        "tarifa": "12",
                         "additional_discount": "0",
                         "value": "12",
                     },
@@ -68,9 +70,11 @@ def main():
         ],
     )
 
-    bill.get_xml()
     # Test Validation
-    # from pprint import pprint
+
+    print(bill.get_xml())
+
+    bill.validate_sri()
 
     # pprint()
 
