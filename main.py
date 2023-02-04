@@ -46,12 +46,33 @@ def main():
                 "unit_time": "dias",
             },
         ],
+        lines_items=[
+            {
+                "code": "0001",
+                "aux_code": "0001",
+                "description": "Producto 1",
+                "quantity": "1",
+                "unit_price": "100",
+                "discount": "0",
+                "price_total_without_tax": "100",
+                "taxes": [
+                    {
+                        "code": "2",
+                        "tax_percentage_code": "2",
+                        "base": "100",
+                        "additional_discount": "0",
+                        "value": "12",
+                    },
+                ],
+            },
+        ],
     )
 
+    bill.get_xml()
     # Test Validation
-    from pprint import pprint
+    # from pprint import pprint
 
-    pprint(bill.get_xml())
+    # pprint()
 
 
 if __name__ == "__main__":

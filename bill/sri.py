@@ -35,14 +35,6 @@ class TaxItem(BaseModel):
     value: str
 
 
-#  <pago>
-#                 <formaPago>01</formaPago>
-#                 <total>50.00</total>
-#                 <plazo>50.00</plazo>
-#                 <unidadTiempo>unidadTiem</unidadTiempo>
-#             </pago>
-
-
 class PaymentItem(BaseModel):
     """
     Class for handling payment items
@@ -52,6 +44,43 @@ class PaymentItem(BaseModel):
     total: str
     terms: int
     unit_time: UnitTimeEnum
+
+
+#       <detalle>
+#             <detallesAdicionales>
+#                 <detAdicional nombre="nombre0" valor="valor0"/>
+#                 <detAdicional nombre="nombre1" valor="valor1"/>
+#             </detallesAdicionales>
+#             <impuestos>
+#                 <impuesto>
+#                     <codigo>2</codigo>
+#                     <codigoPorcentaje>0</codigoPorcentaje>
+#                     <tarifa>49.50</tarifa>
+#                     <baseImponible>50.00</baseImponible>
+#                     <valor>50.00</valor>
+#                 </impuesto>
+#                 <impuesto>
+#                     <codigo>2</codigo>
+#                     <codigoPorcentaje>0</codigoPorcentaje>
+#                     <tarifa>49.50</tarifa>
+#                     <baseImponible>50.00</baseImponible>
+#                     <valor>50.00</valor>
+#                 </impuesto>
+#             </impuestos>
+#         </detalle>
+class LineItem(BaseModel):
+    """
+    Class for handling line items
+    """
+
+    code: str
+    aux_code: str
+    description: str
+    quantity: str
+    unit_price: str
+    discount: str
+    price_total_without_tax: str
+    taxes: List[TaxItem]
 
 
 class SRI(BaseModel):
@@ -80,6 +109,7 @@ class SRI(BaseModel):
     customer_address: str
     taxes: List[TaxItem]
     payments: List[PaymentItem]
+    lines_items: List[LineItem]
 
     def __get_reception_url(self):
         """
@@ -196,6 +226,7 @@ class SRI(BaseModel):
                 "importeTotal": 100,
                 "impuestos": self.taxes,
                 "pagos": self.payments,
+                "detalles": self.lines_items,
             }
         )
 

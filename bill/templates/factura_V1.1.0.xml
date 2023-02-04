@@ -100,6 +100,35 @@
 <!--        <valorRetRenta>50.00</valorRetRenta>-->
     </infoFactura>
     <detalles>
+
+        {% for i in detalles %}
+
+        <detalle>
+            <codigoPrincipal>{{ i.code }}</codigoPrincipal>
+            <codigoAuxiliar>{{ i.code_aux }}</codigoAuxiliar>
+            <descripcion>{{ i.description }}</descripcion>
+            <cantidad>{{ i.quantity }}</cantidad>
+            <precioUnitario>{{ i.unit_price }}</precioUnitario>
+            <descuento>{{ i.discount }}</descuento>
+            <precioTotalSinImpuesto>{{ i.total_price }}</precioTotalSinImpuesto>
+<!--            <detallesAdicionales>-->
+<!--                <detAdicional nombre="nombre0" valor="valor0"/>-->
+<!--                <detAdicional nombre="nombre1" valor="valor1"/>-->
+<!--            </detallesAdicionales>-->
+            <impuestos>
+                {% for j in i.taxes %}
+                <impuesto>
+                    <codigo>{{ j.code.value }}</codigo>
+                    <codigoPorcentaje>{{ j.code_parcentage_tax }}</codigoPorcentaje>
+                    <tarifa>{{ j.tarifa }}</tarifa>
+                    <baseImponible>{{ j.base }}</baseImponible>
+                    <valor>{{ j.value }}</valor>
+                </impuesto>
+                {% endfor %}
+            </impuestos>
+        </detalle>
+
+        {% endfor %}
         <detalle>
             <codigoPrincipal>codigoPrincipal0</codigoPrincipal>
             <codigoAuxiliar>codigoAuxiliar0</codigoAuxiliar>
@@ -110,10 +139,7 @@
             <precioSinSubsidio>50.000000</precioSinSubsidio>
             <descuento>50.00</descuento>
             <precioTotalSinImpuesto>50.00</precioTotalSinImpuesto>
-            <detallesAdicionales>
-                <detAdicional nombre="nombre0" valor="valor0"/>
-                <detAdicional nombre="nombre1" valor="valor1"/>
-            </detallesAdicionales>
+
             <impuestos>
                 <impuesto>
                     <codigo>2</codigo>
