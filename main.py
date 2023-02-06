@@ -9,6 +9,9 @@ def main():
 
     print("Test SRI")
 
+    cert = "VICTOR_QUILLAY.p12"
+    password = "NrvAK9y5jcx9"
+
     bill = SRI(
         emission_date=date.today(),
         document_type="01",
@@ -18,6 +21,7 @@ def main():
         billing_name="Distribuidora de Suministros Nacional S.A.",
         company_name="Empresa Importadora y Exportadora de Piezas",
         company_address="Av. 6 de Diciembre y Av. 10 de Agosto",
+        matriz_address="Av. 6 de Diciembre y Av. 10 de Agosto",
         numeric_code="00000001",
         company_contribuyente_especial="5368",
         company_obligado_contabilidad="SI",
@@ -68,13 +72,21 @@ def main():
                 ],
             },
         ],
+        total_discount=0,
+        tips=0,
+        total_without_tax=100,
+        grand_total=112,
+        certificate=cert,
+        password=password,
     )
 
     # Test Validation
 
-    print(bill.get_xml())
+    # print(bill.get_xml())
 
     bill.validate_sri()
+
+    # bill.get_xml_signed()
 
     # pprint()
 

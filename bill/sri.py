@@ -5,6 +5,7 @@
 
 import os
 import zeep
+
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
 from typing import Set, Tuple, List, Union, Literal
@@ -20,6 +21,14 @@ from .enum import (
     UnitTimeEnum,
     PaymentMethodEnum,
     IdentificationTypeEnum,
+)
+from signxml import DigestAlgorithm
+from signxml.xades import (
+    XAdESSigner,
+    XAdESVerifier,
+    XAdESVerifyResult,
+    XAdESSignaturePolicy,
+    XAdESDataObjectFormat,
 )
 
 
@@ -69,6 +78,7 @@ class SRI(BaseModel):
 
     environment: EnvironmentEnum
     document_type: DocumentTypeEnum = DocumentTypeEnum.INVOICE
+    matriz_address: str
     billing_name: constr(min_length=3, max_length=300)
     company_name: constr(min_length=3, max_length=300)
     company_ruc: constr(min_length=13, max_length=13)
@@ -89,6 +99,12 @@ class SRI(BaseModel):
     taxes: List[TaxItem]
     payments: List[PaymentItem]
     lines_items: List[LineItem]
+    total_without_tax: float
+    total_discount: float
+    tips: float
+    grand_total: float
+    certificate: str
+    password: str
 
     def __get_reception_url(self):
         """
@@ -175,37 +191,9 @@ class SRI(BaseModel):
 
         return loader.get_template("factura_V1.1.0.xml").render(
             {
-                # Info Tributaria
-                "companyRuc": self.company_ruc,
-                "environment": self.environment,
-                "serie": self.serie,
-                "razonSocial": self.billing_name,
-                "nombreComercial": self.company_name,
-                "numeric_code": self.numeric_code,
-                "tipoEmision": self.emission_type,
+                "bill": self,
                 "claveAcceso": access_key,
-                "dirMatriz": "Calle 1",
-                "secuencial": "000000000",
-                "establecimiento": self.establishment,
-                "ptoEmi": self.point_emission,
-                "dirEstablecimiento": self.company_address,
-                "contribuyenteEspecial": self.company_contribuyente_especial,
-                "obligadoContabilidad": self.company_obligado_contabilidad,
-                # Info de la factura
                 "fechaEmision": self.emission_date.strftime("%d/%m/%Y"),
-                "tipoIdentificacionComprador": self.customer_identification_type,
-                "razonSocialComprador": self.customer_billing_name,
-                "identificacionComprador": self.customer_identification,
-                "direccionComprador": self.customer_address,
-                # Total Information
-                "totalSinImpuestos": 0,
-                "totalDescuento": 0,
-                "totalConImpuestos": 0,
-                "propina": 0,
-                "importeTotal": 100,
-                "impuestos": self.taxes,
-                "pagos": self.payments,
-                "detalles": self.lines_items,
             }
         )
 
@@ -230,11 +218,30 @@ class SRI(BaseModel):
 
         return is_valid
 
-    def sign(self):
+    def get_xml_signed(self):
         """
         Function to sign the electronic invoice
         """
-        pass
+
+        from OpenSSL import crypto
+
+        p12 = crypto.load_pkcs12(open(self.certificate, "rb").read(), self.password)
+
+        # PEM formatted private key
+        key = crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey())
+
+        # PEM formatted certificate
+        cert = crypto.dump_certificate(crypto.FILETYPE_PEM, p12.get_certificate())
+
+        from lxml import etree
+        from signxml import XMLSigner, XMLVerifier
+
+        data_to_sign = self.get_xml().encode("utf-8")
+        root = etree.fromstring(data_to_sign)
+        signed_root = XMLSigner().sign(root, key=key, cert=cert)
+        verified_data = XMLVerifier().verify(signed_root, x509_cert=cert).signed_xml
+
+        print(signed_root)
 
     def get_authorization(self):
         """
@@ -245,11 +252,5 @@ class SRI(BaseModel):
     def get_qr(self):
         """
         Function to get the qr of the electronic invoice
-        """
-        pass
-
-    def get_xml_signed(self):
-        """
-        Function to get the xml signed of the electronic invoice
         """
         pass
