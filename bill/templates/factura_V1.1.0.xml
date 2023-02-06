@@ -3,37 +3,36 @@
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="file:/C:/borrar/xsd/10-xsd-1_V1.1.0.xsd" id="comprobante" version="1.1.0">
        <infoTributaria>
-        <ambiente>{{ environment.value }}</ambiente>
-        <tipoEmision>{{ tipoEmision.value }}</tipoEmision>
-        <razonSocial>{{ razonSocial}}</razonSocial>
-        <nombreComercial>{{ nombreComercial}}</nombreComercial>
-        <ruc>{{ companyRuc }}</ruc>
+        <ambiente>{{ bill.environment.value }}</ambiente>
+        <tipoEmision>{{ bill.emission_type.value }}</tipoEmision>
+        <razonSocial>{{ bill.billing_name}}</razonSocial>
+        <nombreComercial>{{ bill.company_name}}</nombreComercial>
+        <ruc>{{ bill.company_ruc }}</ruc>
         <claveAcceso>{{ claveAcceso }}</claveAcceso>
         <codDoc>01</codDoc>
-        <estab>{{ establecimiento }}</estab>
-        <ptoEmi>{{ ptoEmi }}</ptoEmi>
-        <secuencial>{{ secuencial }}</secuencial>
-        <dirMatriz>{{ dirMatriz }}</dirMatriz>
+        <estab>{{  bill.establishment }}</estab>
+        <ptoEmi>{{ bill.point_emission }}</ptoEmi>
+        <secuencial>{{ bill.sequential }}</secuencial>
+        <dirMatriz>{{ bill.matriz_address }}</dirMatriz>
         <agenteRetencion>0</agenteRetencion>
     </infoTributaria>
 
     <infoFactura>
         <fechaEmision>{{ fechaEmision }}</fechaEmision>
-        <dirEstablecimiento>{{ dirEstablecimiento }}</dirEstablecimiento>
-        <contribuyenteEspecial>{{ contribuyenteEspecial }}</contribuyenteEspecial>
-        <obligadoContabilidad>{{ obligadoContabilidad }}</obligadoContabilidad>
+        <dirEstablecimiento>{{ bill.company_address }}</dirEstablecimiento>
+        <contribuyenteEspecial>{{ bill.company_contribuyente_especial }}</contribuyenteEspecial>
+        <obligadoContabilidad>{{ bill.company_obligado_contabilidad }}</obligadoContabilidad>
 
-        <tipoIdentificacionComprador>{{ tipoIdentificacionComprador.value }}</tipoIdentificacionComprador>
-        <razonSocialComprador>{{razonSocialComprador}}</razonSocialComprador>
-        <identificacionComprador>{{ identificacionComprador}}</identificacionComprador>
-        <direccionComprador>{{ direccionComprador }}</direccionComprador>
+        <tipoIdentificacionComprador>{{ bill.customer_identification_type.value }}</tipoIdentificacionComprador>
+        <razonSocialComprador>{{bill.customer_billing_name}}</razonSocialComprador>
+        <identificacionComprador>{{ bill.customer_identification}}</identificacionComprador>
+        <direccionComprador>{{  bill.customer_address }}</direccionComprador>
 
-        <totalSinImpuestos>{{ totalSinImpuestos }}</totalSinImpuestos>
-        <totalDescuento>{{ totalDescuento }}</totalDescuento>
-
+        <totalSinImpuestos>{{ bill.total_without_tax }}</totalSinImpuestos>
+        <totalDescuento>{{ bill.total_discount }}</totalDescuento>
 
         <totalConImpuestos>
-            {% for i in impuestos %}
+            {% for i in bill.taxes %}
             <totalImpuesto>
                 <codigo>{{ i.code.value }}</codigo>
                 <codigoPorcentaje>{{ i.tax_percentage_code.value }}</codigoPorcentaje>
@@ -44,11 +43,11 @@
             {% endfor %}
         </totalConImpuestos>
 
-        <propina>{{ propina }}</propina>
-        <importeTotal>{{ importeTotal }} </importeTotal>
+        <propina>{{ bill.tips }}</propina>
+        <importeTotal>{{ bill.grand_total }} </importeTotal>
         <moneda>DOLAR</moneda>
         <pagos>
-            {% for i in pagos %}
+            {% for i in bill.payments %}
             <pago>
                 <formaPago>{{ i.payment_method.value }}</formaPago>
                 <total>{{ i.total }}</total>
@@ -60,7 +59,7 @@
     </infoFactura>
     <detalles>
 
-        {% for i in detalles %}
+        {% for i in bill.lines_items %}
 
         <detalle>
             <codigoPrincipal>{{ i.code }}</codigoPrincipal>
