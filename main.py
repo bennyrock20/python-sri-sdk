@@ -2,6 +2,7 @@ from bill.sri import SRI
 from datetime import date
 import os
 
+
 def main():
     """
     Test SRI
@@ -82,13 +83,9 @@ def main():
 
     # Test Validation
 
-    # print(bill.get_xml())
-
-    # bill.validate_sri()
-
+    print(bill.get_xml())
     bill.get_xml_signed()
-
-    # pprint()
+    print("validate", bill.validate_sri())
 
 
 if __name__ == "__main__":

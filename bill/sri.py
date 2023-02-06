@@ -6,6 +6,18 @@
 import os
 import zeep
 
+from OpenSSL import crypto
+from lxml import etree
+
+from signxml import DigestAlgorithm
+from signxml.xades import (
+    XAdESSigner,
+    XAdESVerifier,
+    XAdESVerifyResult,
+    XAdESSignaturePolicy,
+    XAdESDataObjectFormat,
+)
+
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
 from typing import Set, Tuple, List, Union, Literal
@@ -197,6 +209,54 @@ class SRI(BaseModel):
             }
         )
 
+    def get_xml_signed(self):
+        """
+        Function to sign the electronic invoice
+        """
+
+        p12 = crypto.load_pkcs12(open(self.certificate, "rb").read(), self.password)
+
+        # PEM formatted private key
+        key = crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey())
+
+        # PEM formatted certificate
+        cert = crypto.dump_certificate(crypto.FILETYPE_PEM, p12.get_certificate())
+
+        # Get issuer
+        issuer = p12.get_certificate().get_issuer()
+
+        # Get subject
+        subject = p12.get_certificate().get_subject()
+
+        # Get serial number
+
+        serial_number = p12.get_certificate().get_serial_number()
+
+        signature_policy = XAdESSignaturePolicy(
+            Identifier="MyPolicyIdentifier",
+            Description="Hello XAdES",
+            DigestMethod=DigestAlgorithm.SHA256,
+            DigestValue="Ohixl6upD6av8N7pEvDABhEL6hM=",
+        )
+        data_object_format = XAdESDataObjectFormat(
+            Description="My XAdES signature",
+            MimeType="text/xml",
+        )
+        signer = XAdESSigner(
+            signature_policy=signature_policy,
+            claimed_roles=["signer"],
+            data_object_format=data_object_format,
+            c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+        )
+
+        doc = self.get_xml().encode("utf-8")
+        data = etree.fromstring(doc)
+        signed_doc = signer.sign(data, key=key, cert=cert)
+
+        # print(etree.tostring(signed_doc, pretty_print=True, encoding="unicode"))
+
+        return etree.tostring(signed_doc, pretty_print=True, encoding="unicode")
+
     def validate_sri(self):
         """
         Function to validate the electronic invoice in the SRI
@@ -206,7 +266,7 @@ class SRI(BaseModel):
 
         client = zeep.Client(wsdl=self.__get_reception_url())
         # transform the xml to bytes
-        xml = self.get_xml().encode("utf-8")
+        xml = self.get_xml_signed().encode("utf-8")
 
         response = client.service.validarComprobante(xml)
 
@@ -217,31 +277,6 @@ class SRI(BaseModel):
             print(messages)
 
         return is_valid
-
-    def get_xml_signed(self):
-        """
-        Function to sign the electronic invoice
-        """
-
-        from OpenSSL import crypto
-
-        p12 = crypto.load_pkcs12(open(self.certificate, "rb").read(), self.password)
-
-        # PEM formatted private key
-        key = crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey())
-
-        # PEM formatted certificate
-        cert = crypto.dump_certificate(crypto.FILETYPE_PEM, p12.get_certificate())
-
-        from lxml import etree
-        from signxml import XMLSigner, XMLVerifier
-
-        data_to_sign = self.get_xml().encode("utf-8")
-        root = etree.fromstring(data_to_sign)
-        signed_root = XMLSigner().sign(root, key=key, cert=cert)
-        verified_data = XMLVerifier().verify(signed_root, x509_cert=cert).signed_xml
-
-        print(signed_root)
 
     def get_authorization(self):
         """
