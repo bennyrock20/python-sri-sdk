@@ -1,6 +1,6 @@
 from bill.sri import SRI
 from datetime import date
-
+import os
 
 def main():
     """
@@ -9,8 +9,8 @@ def main():
 
     print("Test SRI")
 
-    cert = "VICTOR_QUILLAY.p12"
-    password = "NrvAK9y5jcx9"
+    cert = os.getenv("CERT")
+    password = os.getenv("PASSWORD")
 
     bill = SRI(
         emission_date=date.today(),
@@ -84,9 +84,9 @@ def main():
 
     # print(bill.get_xml())
 
-    bill.validate_sri()
+    # bill.validate_sri()
 
-    # bill.get_xml_signed()
+    bill.get_xml_signed()
 
     # pprint()
 
