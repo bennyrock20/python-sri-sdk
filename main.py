@@ -1,6 +1,7 @@
 from bill.sri import SRI
-from datetime import date
+from datetime import date, timedelta
 import os
+from pprint import pprint as ppprint
 
 
 def main():
@@ -14,7 +15,7 @@ def main():
     password = os.getenv("PASSWORD")
 
     bill = SRI(
-        emission_date=date.today(),
+        emission_date=date.today() - timedelta(days=1),
         document_type="01",
         environment="1",
         serie="001001",
@@ -83,9 +84,10 @@ def main():
 
     # Test Validation
 
-    print(bill.get_xml())
-    bill.get_xml_signed()
-    print("validate", bill.validate_sri())
+    res = bill.get_xml_signed()
+    ppprint(res)
+    assert bill.validate_sri()
+    bill.get_authorization()
 
 
 if __name__ == "__main__":

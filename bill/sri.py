@@ -5,6 +5,7 @@
 
 import os
 import zeep
+import base64
 
 from OpenSSL import crypto
 from lxml import etree
@@ -131,9 +132,9 @@ class SRI(BaseModel):
         """
         Function to get the url of authorization of invoices
         """
-        if self.environment.value == "testing":
+        if self.environment.value == "1":
             return "https://celcer.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl"
-        elif self.environment.value == "production":
+        elif self.environment.value == "2":
             return "https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl"
 
     def __generate_access_key(self):
@@ -232,14 +233,18 @@ class SRI(BaseModel):
 
         serial_number = p12.get_certificate().get_serial_number()
 
+        cert_digest = p12.get_certificate().digest("sha1")
+        # encode base64
+        cert_digest = base64.b64encode(cert_digest).decode("utf-8")
+
         signature_policy = XAdESSignaturePolicy(
             Identifier="MyPolicyIdentifier",
-            Description="Hello XAdES",
+            Description="XAdES",
             DigestMethod=DigestAlgorithm.SHA256,
-            DigestValue="Ohixl6upD6av8N7pEvDABhEL6hM=",
+            DigestValue=cert_digest,
         )
         data_object_format = XAdESDataObjectFormat(
-            Description="My XAdES signature",
+            Description="contenido comprobante",
             MimeType="text/xml",
         )
         signer = XAdESSigner(
@@ -251,7 +256,13 @@ class SRI(BaseModel):
 
         doc = self.get_xml().encode("utf-8")
         data = etree.fromstring(doc)
-        signed_doc = signer.sign(data, key=key, cert=cert)
+        signed_doc = signer.sign(
+            data,
+            key=key,
+            cert=cert,
+            reference_uri=["#comprobante"],
+            always_add_key_value=True,
+        )
 
         # print(etree.tostring(signed_doc, pretty_print=True, encoding="unicode"))
 
@@ -282,7 +293,20 @@ class SRI(BaseModel):
         """
         Function to get the authorization of the electronic invoice in the SRI
         """
-        pass
+
+        from zeep import Client
+
+        client = zeep.Client(wsdl=self.__get_authorization_url())
+
+        key = self.__generate_access_key()
+
+        digit_verifier = SRI.generate_digit_verifier(key)
+
+        access_key = "{}{}".format(key, digit_verifier)
+
+        response = client.service.autorizacionComprobante(access_key)
+
+        print(response)
 
     def get_qr(self):
         """
