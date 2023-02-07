@@ -3,34 +3,23 @@
 @author: Rush Delivery App
 """
 
-import os
+from datetime import date
+from typing import List, Literal
+
 import zeep
-import base64
-
 from OpenSSL import crypto
+from jinja2 import Environment, PackageLoader, select_autoescape
 from lxml import etree
-
+from pydantic import BaseModel, constr
 from signxml import DigestAlgorithm
 from signxml.xades import (
-    XAdESSigner,
     XAdESVerifier,
-    XAdESVerifyResult,
-    XAdESSignaturePolicy,
     XAdESDataObjectFormat,
 )
-from signxml import DigestAlgorithm
 
-
-from .XAdESSigner import  MyXAdESSigner
-
-from datetime import datetime
-from jinja2 import Environment, PackageLoader, select_autoescape
-from typing import Set, Tuple, List, Union, Literal
-from pydantic import BaseModel, Field, constr
-from datetime import date, datetime, time, timedelta
+from .XAdESSigner import MyXAdESSigner
 from .enum import (
     EnvironmentEnum,
-    StatusEnum,
     DocumentTypeEnum,
     EmmisionTypeEnum,
     TaxCodeEnum,
@@ -38,14 +27,6 @@ from .enum import (
     UnitTimeEnum,
     PaymentMethodEnum,
     IdentificationTypeEnum,
-)
-from signxml import DigestAlgorithm
-from signxml.xades import (
-    XAdESSigner,
-    XAdESVerifier,
-    XAdESVerifyResult,
-    XAdESSignaturePolicy,
-    XAdESDataObjectFormat,
 )
 
 
@@ -263,8 +244,6 @@ class SRI(BaseModel):
         Function to validate the electronic invoice in the SRI
         """
 
-        from zeep import Client
-
         client = zeep.Client(wsdl=self.__get_reception_url())
         # transform the xml to bytes
         xml = self.get_xml_signed().encode("utf-8")
@@ -283,8 +262,6 @@ class SRI(BaseModel):
         """
         Function to get the authorization of the electronic invoice in the SRI
         """
-
-        from zeep import Client
 
         client = zeep.Client(wsdl=self.__get_authorization_url())
 
