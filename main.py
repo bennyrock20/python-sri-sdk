@@ -15,7 +15,7 @@ def main():
     password = os.getenv("PASSWORD")
 
     bill = SRI(
-        emission_date=date.today() - timedelta(days=19),
+        emission_date=date.today() - timedelta(days=21),
         document_type="01",
         environment="1",
         serie="001001",

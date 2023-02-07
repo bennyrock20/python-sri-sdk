@@ -195,7 +195,7 @@ class SRI(BaseModel):
             }
         )
 
-        return render
+        return render.replace("\n", "")
 
     def get_xml_signed(self):
         """
