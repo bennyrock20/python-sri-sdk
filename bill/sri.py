@@ -18,6 +18,10 @@ from signxml.xades import (
     XAdESSignaturePolicy,
     XAdESDataObjectFormat,
 )
+from signxml import DigestAlgorithm
+
+
+from .XAdESSigner import  MyXAdESSigner
 
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -223,48 +227,27 @@ class SRI(BaseModel):
         # PEM formatted certificate
         cert = crypto.dump_certificate(crypto.FILETYPE_PEM, p12.get_certificate())
 
-        # Get issuer
-        issuer = p12.get_certificate().get_issuer()
-
-        # Get subject
-        subject = p12.get_certificate().get_subject()
-
-        # Get serial number
-
-        serial_number = p12.get_certificate().get_serial_number()
-
-        cert_digest = p12.get_certificate().digest("sha1")
-        # encode base64
-        cert_digest = base64.b64encode(cert_digest).decode("utf-8")
-
-        signature_policy = XAdESSignaturePolicy(
-            Identifier="MyPolicyIdentifier",
-            Description="XAdES",
-            DigestMethod=DigestAlgorithm.SHA256,
-            DigestValue=cert_digest,
-        )
         data_object_format = XAdESDataObjectFormat(
             Description="contenido comprobante",
             MimeType="text/xml",
         )
-        signer = XAdESSigner(
-            signature_policy=signature_policy,
-            claimed_roles=["signer"],
-            data_object_format=data_object_format,
+        signer = MyXAdESSigner(
+            # data_object_format=data_object_format,
             c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+            signature_algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+            digest_algorithm=DigestAlgorithm.SHA256
         )
 
         doc = self.get_xml().encode("utf-8")
         data = etree.fromstring(doc)
+
+
         signed_doc = signer.sign(
             data,
             key=key,
             cert=cert,
             reference_uri=["#comprobante"],
-            always_add_key_value=True,
         )
-
-        # print(etree.tostring(signed_doc, pretty_print=True, encoding="unicode"))
 
         return etree.tostring(signed_doc, pretty_print=True, encoding="unicode")
 

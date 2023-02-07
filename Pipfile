@@ -7,7 +7,7 @@ name = "pypi"
 zeep = "*"
 jinja2 = "*"
 pydantic = "*"
-signxml = "*"
+signxml = "==2.10.1"
 
 [dev-packages]
 pytest = "*"

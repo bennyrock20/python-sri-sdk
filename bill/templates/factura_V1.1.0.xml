@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<factura xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="file:/C:/borrar/xsd/10-xsd-1_V1.1.0.xsd" id="comprobante" version="1.1.0">
+<factura id="comprobante" version="1.1.0">
        <infoTributaria>
         <ambiente>{{ bill.environment.value }}</ambiente>
         <tipoEmision>{{ bill.emission_type.value }}</tipoEmision>
@@ -14,23 +12,17 @@
         <ptoEmi>{{ bill.point_emission }}</ptoEmi>
         <secuencial>{{ bill.sequential }}</secuencial>
         <dirMatriz>{{ bill.matriz_address }}</dirMatriz>
-        <agenteRetencion>0</agenteRetencion>
     </infoTributaria>
-
     <infoFactura>
         <fechaEmision>{{ fechaEmision }}</fechaEmision>
         <dirEstablecimiento>{{ bill.company_address }}</dirEstablecimiento>
-        <contribuyenteEspecial>{{ bill.company_contribuyente_especial }}</contribuyenteEspecial>
         <obligadoContabilidad>{{ bill.company_obligado_contabilidad }}</obligadoContabilidad>
-
         <tipoIdentificacionComprador>{{ bill.customer_identification_type.value }}</tipoIdentificacionComprador>
         <razonSocialComprador>{{bill.customer_billing_name}}</razonSocialComprador>
         <identificacionComprador>{{ bill.customer_identification}}</identificacionComprador>
         <direccionComprador>{{  bill.customer_address }}</direccionComprador>
-
         <totalSinImpuestos>{{ bill.total_without_tax }}</totalSinImpuestos>
         <totalDescuento>{{ bill.total_discount }}</totalDescuento>
-
         <totalConImpuestos>
             {% for i in bill.taxes %}
             <totalImpuesto>
@@ -42,7 +34,6 @@
             </totalImpuesto>
             {% endfor %}
         </totalConImpuestos>
-
         <propina>{{ bill.tips }}</propina>
         <importeTotal>{{ bill.grand_total }} </importeTotal>
         <moneda>DOLAR</moneda>
@@ -58,9 +49,7 @@
         </pagos>
     </infoFactura>
     <detalles>
-
         {% for i in bill.lines_items %}
-
         <detalle>
             <codigoPrincipal>{{ i.code }}</codigoPrincipal>
             <codigoAuxiliar>{{ i.aux_code }}</codigoAuxiliar>
@@ -81,7 +70,6 @@
                 {% endfor %}
             </impuestos>
         </detalle>
-
         {% endfor %}
     </detalles>
     <tipoNegociable>
