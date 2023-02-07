@@ -206,7 +206,7 @@ class SRI(BaseModel):
 
         access_key = "{}{}".format(key, digit_verifier)
 
-        return loader.get_template("factura_V1.1.0.xml").render(
+        render = loader.get_template("factura_V1.1.0.xml").render(
             {
                 "bill": self,
                 "claveAcceso": access_key,
@@ -214,12 +214,14 @@ class SRI(BaseModel):
             }
         )
 
+        return render
+
     def get_xml_signed(self):
         """
         Function to sign the electronic invoice
         """
 
-        p12 = crypto.load_pkcs12(open(self.certificate, "rb").read(), self.password)
+        p12 = crypto.load_pkcs12(open(self.certificate, "rb").read(), self.password.encode("utf-8"))
 
         # PEM formatted private key
         key = crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey())
@@ -232,15 +234,15 @@ class SRI(BaseModel):
             MimeType="text/xml",
         )
         signer = MyXAdESSigner(
-            # data_object_format=data_object_format,
+            data_object_format=data_object_format,
             c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
             signature_algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1",
-            digest_algorithm=DigestAlgorithm.SHA256
+            digest_algorithm=DigestAlgorithm.SHA1
         )
 
         doc = self.get_xml().encode("utf-8")
-        data = etree.fromstring(doc)
 
+        data = etree.fromstring(doc)
 
         signed_doc = signer.sign(
             data,
@@ -249,7 +251,12 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        return etree.tostring(signed_doc, pretty_print=True, encoding="unicode")
+        verifier = XAdESVerifier()
+        verify_results = verifier.verify(
+            signed_doc, x509_cert=cert, expect_references=3
+        )
+
+        return etree.tostring(signed_doc, pretty_print=False, encoding="unicode", method='xml')
 
     def validate_sri(self):
         """

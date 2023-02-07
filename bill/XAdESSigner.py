@@ -14,7 +14,7 @@ class MyXAdESSigner(XAdESSigner, XMLSigner):
 
     def add_signing_certificate(self, signed_signature_properties, sig_root, signing_settings: SigningSettings):
         signing_cert_v2 = SubElement(
-            signed_signature_properties, xades_tag("SigningCertificateV2"), nsmap=self.namespaces
+            signed_signature_properties, xades_tag("SigningCertificate"), nsmap=self.namespaces
         )
         for cert in signing_settings.cert_chain:  # type: ignore
             if isinstance(cert, X509):
@@ -37,7 +37,7 @@ class MyXAdESSigner(XAdESSigner, XMLSigner):
 
             issuer_name_bytes = loaded_cert.get_issuer()
 
-            issuer_name.text ="CN=AUTORIDAD DE CERTIFICACION SUBCA-2 SECURITY DATA,OU=ENTIDAD DE CERTIFICACION DE INFORMACION,O=SECURITY DATA S.A. 2,C=EC"
+            issuer_name.text="CN=AUTORIDAD DE CERTIFICACION SUBCA-2 SECURITY DATA,OU=ENTIDAD DE CERTIFICACION DE INFORMACION,O=SECURITY DATA S.A. 2,C=EC "
 
             # Add Issuer Serial Number
             issuer_serial_number = loaded_cert.get_serial_number()

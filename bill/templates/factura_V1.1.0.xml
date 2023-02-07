@@ -23,33 +23,28 @@
         <direccionComprador>{{  bill.customer_address }}</direccionComprador>
         <totalSinImpuestos>{{ bill.total_without_tax }}</totalSinImpuestos>
         <totalDescuento>{{ bill.total_discount }}</totalDescuento>
-        <totalConImpuestos>
-            {% for i in bill.taxes %}
+        <totalConImpuestos>{% for i in bill.taxes %}
             <totalImpuesto>
                 <codigo>{{ i.code.value }}</codigo>
                 <codigoPorcentaje>{{ i.tax_percentage_code.value }}</codigoPorcentaje>
                 <descuentoAdicional>{{ i.additional_discount }}</descuentoAdicional>
                 <baseImponible>{{ i.base }}</baseImponible>
                 <valor>{{ i.value }}</valor>
-            </totalImpuesto>
-            {% endfor %}
+            </totalImpuesto>{% endfor %}
         </totalConImpuestos>
         <propina>{{ bill.tips }}</propina>
         <importeTotal>{{ bill.grand_total }} </importeTotal>
         <moneda>DOLAR</moneda>
-        <pagos>
-            {% for i in bill.payments %}
+        <pagos>{% for i in bill.payments %}
             <pago>
                 <formaPago>{{ i.payment_method.value }}</formaPago>
                 <total>{{ i.total }}</total>
                 <plazo>{{ i.terms }}</plazo>
                 <unidadTiempo>{{ i.unit_time.value }}</unidadTiempo>
-            </pago>
-            {% endfor %}
+            </pago>{% endfor %}
         </pagos>
     </infoFactura>
-    <detalles>
-        {% for i in bill.lines_items %}
+    <detalles>{% for i in bill.lines_items %}
         <detalle>
             <codigoPrincipal>{{ i.code }}</codigoPrincipal>
             <codigoAuxiliar>{{ i.aux_code }}</codigoAuxiliar>
@@ -58,19 +53,16 @@
             <precioUnitario>{{ i.unit_price }}</precioUnitario>
             <descuento>{{ i.discount }}</descuento>
             <precioTotalSinImpuesto>{{ i.price_total_without_tax }}</precioTotalSinImpuesto>
-            <impuestos>
-                {% for j in i.taxes %}
+            <impuestos>{% for j in i.taxes %}
                 <impuesto>
                     <codigo>{{ j.code.value }}</codigo>
                     <codigoPorcentaje>{{ j.tax_percentage_code.value }}</codigoPorcentaje>
                     <tarifa>{{ j.tarifa }}</tarifa>
                     <baseImponible>{{ j.base }}</baseImponible>
                     <valor>{{ j.value }}</valor>
-                </impuesto>
-                {% endfor %}
+                </impuesto>{% endfor %}
             </impuestos>
-        </detalle>
-        {% endfor %}
+        </detalle>{% endfor %}
     </detalles>
     <tipoNegociable>
         <correo>bill@rushdelivery.app</correo>

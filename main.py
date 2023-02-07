@@ -15,7 +15,7 @@ def main():
     password = os.getenv("PASSWORD")
 
     bill = SRI(
-        emission_date=date.today() - timedelta(days=15),
+        emission_date=date.today() - timedelta(days=19),
         document_type="01",
         environment="1",
         serie="001001",
@@ -88,8 +88,8 @@ def main():
     res = bill.get_xml_signed()
     print(res)
 
-    # assert bill.validate_sri()
-    # bill.get_authorization()
+    assert bill.validate_sri()
+    bill.get_authorization()
 
 
 if __name__ == "__main__":
