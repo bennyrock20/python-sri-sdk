@@ -26,6 +26,8 @@ def test_sri_xml():
 
     assert "0999999999001" in xml
 
+    # Todo: Add more tests
+
     # 5.1Los contribuyentes generarán sus comprobantes electrónicos en formato .xml conforme a los esquemas .xsd que
     # están disponibles en el portal web del SRI, a través de sus propios
     # aplicativos informáticos o mediante el facturador electrónico que el SRI dispone gratuitamente

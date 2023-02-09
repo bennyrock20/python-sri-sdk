@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-@author: Rush Delivery App
+@author: @bennyrock20
 """
+
+import os
 
 from datetime import date
 from typing import List, Literal
@@ -13,11 +15,11 @@ from lxml import etree
 from pydantic import BaseModel, constr
 from signxml import DigestAlgorithm
 from signxml.xades import (
-    XAdESVerifier,
     XAdESDataObjectFormat,
 )
 
 from .XAdESSigner import MyXAdESSigner
+
 from .enum import (
     EnvironmentEnum,
     DocumentTypeEnum,
@@ -122,23 +124,27 @@ class SRI(BaseModel):
         elif self.environment.value == "2":
             return "https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl"
 
-    def __generate_access_key(self):
+    def __get_access_key(self):
         """
         Function to generate the access key
         """
         code_number = str(self.numeric_code).zfill(8)
 
-        return (
-            str(self.emission_date.strftime("%d%m%Y"))
-            + str(self.document_type.value)
-            + str(self.company_ruc)
-            + str(self.environment.value)
-            + str(self.establishment)
-            + str(self.point_emission)
-            + str(self.sequential)
-            + str(code_number)
-            + str(self.emission_type.value)
+        key = (
+                str(self.emission_date.strftime("%d%m%Y"))
+                + str(self.document_type.value)
+                + str(self.company_ruc)
+                + str(self.environment.value)
+                + str(self.establishment)
+                + str(self.point_emission)
+                + str(self.sequential)
+                + str(code_number)
+                + str(self.emission_type.value)
         )
+
+        digit_verifier = SRI.generate_digit_verifier(key)
+
+        return "{}{}".format(key, digit_verifier)
 
     @staticmethod
     def generate_digit_verifier(key):
@@ -153,7 +159,7 @@ class SRI(BaseModel):
 
         while x > 0:
             x = x - 1
-            number = int(key[x : x + 1])
+            number = int(key[x: x + 1])
             total = total + (number * factor)
 
             if factor == 7:
@@ -180,12 +186,8 @@ class SRI(BaseModel):
         loader = Environment(
             loader=PackageLoader("bill", "templates"), autoescape=select_autoescape()
         )
-        # Generate access key
-        key = self.__generate_access_key()
 
-        digit_verifier = SRI.generate_digit_verifier(key)
-
-        access_key = "{}{}".format(key, digit_verifier)
+        access_key = self.__get_access_key()
 
         render = loader.get_template("factura_V1.1.0.xml").render(
             {
@@ -218,7 +220,8 @@ class SRI(BaseModel):
             data_object_format=data_object_format,
             c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
             signature_algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1",
-            digest_algorithm=DigestAlgorithm.SHA1
+            digest_algorithm=DigestAlgorithm.SHA1,
+
         )
 
         doc = self.get_xml().encode("utf-8")
@@ -232,12 +235,11 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        verifier = XAdESVerifier()
-        verify_results = verifier.verify(
-            signed_doc, x509_cert=cert, expect_references=3
-        )
+        path_xml = os.path.join(os.getcwd(), 'signed.xml')
+        with open(path_xml, 'w') as f:
+            f.write(etree.tostring(signed_doc, pretty_print=True, encoding="unicode", method='xml'))
 
-        return etree.tostring(signed_doc, pretty_print=False, encoding="unicode", method='xml')
+        return open(path_xml, 'r').read()
 
     def validate_sri(self):
         """
@@ -252,11 +254,7 @@ class SRI(BaseModel):
 
         is_valid = response["estado"] == "RECIBIDA"
 
-        if not is_valid:
-            messages = response["comprobantes"]["comprobante"][0]["mensajes"]
-            print(messages)
-
-        return is_valid
+        return is_valid, response
 
     def get_authorization(self):
         """
@@ -265,15 +263,13 @@ class SRI(BaseModel):
 
         client = zeep.Client(wsdl=self.__get_authorization_url())
 
-        key = self.__generate_access_key()
-
-        digit_verifier = SRI.generate_digit_verifier(key)
-
-        access_key = "{}{}".format(key, digit_verifier)
+        access_key = self.__get_access_key()
 
         response = client.service.autorizacionComprobante(access_key)
 
-        print(response)
+        authorized = response["autorizaciones"]["autorizacion"][0]["estado"] == "AUTORIZADO"
+
+        return authorized, response
 
     def get_qr(self):
         """

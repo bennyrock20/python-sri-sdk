@@ -1,12 +1,11 @@
 from bill.sri import SRI
 from datetime import date, timedelta
 import os
-from pprint import pprint as ppprint
 
 
 def main():
     """
-    Test SRI
+    Manual Test SRI
     """
 
     print("Test SRI")
@@ -15,7 +14,7 @@ def main():
     password = os.getenv("PASSWORD")
 
     bill = SRI(
-        emission_date=date.today() - timedelta(days=21),
+        emission_date=date.today() - timedelta(days=37),
         document_type="01",
         environment="1",
         serie="001001",
@@ -30,7 +29,7 @@ def main():
         establishment="001",
         point_emission="001",
         emission_type="1",
-        sequential="000000002",
+        sequential="000000005",
         customer_billing_name="Cliente",
         customer_identification="1792146739001",
         customer_identification_type="04",
@@ -83,13 +82,15 @@ def main():
     )
 
     # Test Validation
-    res = bill.get_xml()
+    # res = bill.get_xml()
 
-    res = bill.get_xml_signed()
-    print(res)
+    # res = bill.get_xml_signed()
 
-    assert bill.validate_sri()
-    bill.get_authorization()
+    valid, m = bill.validate_sri()
+    print(valid, m)
+
+    authorized, m = bill.get_authorization()
+    print(authorized, m)
 
 
 if __name__ == "__main__":

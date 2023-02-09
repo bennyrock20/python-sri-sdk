@@ -12,6 +12,18 @@ from signxml.xades import (
 
 class MyXAdESSigner(XAdESSigner, XMLSigner):
 
+    def _add_reference_to_signed_info(self, sig_root, node_to_reference):
+        signed_info = self._find(sig_root, "SignedInfo")
+        reference = SubElement(signed_info, ds_tag("Reference"), nsmap=self.namespaces)
+        reference.set("URI", f"#{node_to_reference.get('Id')}")
+        reference.set("Type", "http://uri.etsi.org/01903#SignedProperties")
+        reference.set("Id", f"Reference-{node_to_reference.get('Id')}")
+        SubElement(reference, ds_tag("DigestMethod"), nsmap=self.namespaces, Algorithm=self.digest_alg.value)
+        digest_value_node = SubElement(reference, ds_tag("DigestValue"), nsmap=self.namespaces)
+        node_to_reference_c14n = self._c14n(node_to_reference, algorithm=self.c14n_alg)
+        digest = self._get_digest(node_to_reference_c14n, algorithm=self.digest_alg)
+        digest_value_node.text = b64encode(digest).decode()
+
     def add_signing_certificate(self, signed_signature_properties, sig_root, signing_settings: SigningSettings):
         signing_cert_v2 = SubElement(
             signed_signature_properties, xades_tag("SigningCertificate"), nsmap=self.namespaces
