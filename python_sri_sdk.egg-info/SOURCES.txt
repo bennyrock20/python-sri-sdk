@@ -1,0 +1,12 @@
+README.md
+setup.py
+bill/XAdESSigner.py
+bill/__init__.py
+bill/enum.py
+bill/sri.py
+bill/tests.py
+python_sri_sdk.egg-info/PKG-INFO
+python_sri_sdk.egg-info/SOURCES.txt
+python_sri_sdk.egg-info/dependency_links.txt
+python_sri_sdk.egg-info/requires.txt
+python_sri_sdk.egg-info/top_level.txt
