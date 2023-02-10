@@ -12,16 +12,8 @@ Support only FACTURA for now.
 
 ## Installation
 
-Create a virtual environment and install the dependencies:
-
-```bash
-pipenv shell --three
-```
-
-Install the dependencies:
-
-```bash
-pipenv install 
+```shell
+pip install git+https://github.com/bennyrock20/python-sri-sdk.git
 ```
 
 ## Usage
