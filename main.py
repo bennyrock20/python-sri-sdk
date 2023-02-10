@@ -14,7 +14,7 @@ def main():
     password = os.getenv("PASSWORD")
 
     bill = SRI(
-        emission_date=date.today() - timedelta(days=37),
+        emission_date=date.today() - timedelta(days=38),
         document_type="01",
         environment="1",
         serie="001001",
@@ -29,7 +29,7 @@ def main():
         establishment="001",
         point_emission="001",
         emission_type="1",
-        sequential="000000005",
+        sequential="000000006",
         customer_billing_name="Cliente",
         customer_identification="1792146739001",
         customer_identification_type="04",

@@ -106,6 +106,9 @@ class SRI(BaseModel):
     certificate: str
     password: str
 
+    def __init__(self, **data):
+        super().__init__(**data)
+
     def __get_reception_url(self):
         """
         Function to get the url of receipt of invoices
