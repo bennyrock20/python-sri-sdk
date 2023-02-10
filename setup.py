@@ -1,11 +1,13 @@
 import setuptools
 
+VERSION = '1.0.0'
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name='python-sri-sdk',
-    version='1.0.0',
+    version=VERSION,
     author='William Tapa',
     author_email='info@rushdelivery.app',
     description='SRI provides a simple interface to the SRI API.',
@@ -16,7 +18,7 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/bennyrock20/python-sri-sdk/issues"
     },
     license='MIT',
-    packages=['sri'],
+    packages=['bill'],
     install_requires=[
         'zeep====4.2.1',
         'jinja2==3.0.3',
