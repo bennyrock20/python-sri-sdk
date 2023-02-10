@@ -16,7 +16,7 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/bennyrock20/python-sri-sdk/issues"
     },
     license='MIT',
-    packages=[],
+    packages=['sri'],
     install_requires=[
         'zeep====4.2.1',
         'jinja2==3.0.3',
