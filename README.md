@@ -13,6 +13,10 @@ This is not an official SDK, it is a personal project that I use in my company, 
 ## Dependencies
 
 - Python 3.7+
+- signxml 3.0.0
+- pydantic 1.10.4
+- zeep 4.2.1
+- jinga 3.1.2
 
 ## Installation
 
@@ -24,7 +28,7 @@ pip install sri
 
 ```python
 from datetime import date
-from bill.sri import SRI
+from sri import SRI
 
 cert_path_file = "certificado.p12"
 password = "12345678"
