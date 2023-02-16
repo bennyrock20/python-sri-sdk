@@ -5,3 +5,4 @@
 .venv
 signed.xml
 build
+dist

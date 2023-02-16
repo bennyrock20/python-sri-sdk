@@ -1,4 +1,4 @@
-from bill.sri import SRI
+from sri import SRI
 
 
 def test_sri_xml():

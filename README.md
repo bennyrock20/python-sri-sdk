@@ -1,19 +1,23 @@
 # SRI 
 
-SRI provides a simple interface to the SRI API.
+SRI provides a simple way to interact with the SRI API.
 
-Support only FACTURA for now.
+## Disclaimer
 
+This is not an official SDK, it is a personal project that I use in my company, I am not responsible for any damage that this library may cause.
+
+## SUPPORTED DOCUMENTS
+
+- [x] FACTURA
 
 ## Dependencies
 
-- Python 3.10
-- pipenv
+- Python 3.7+
 
 ## Installation
 
 ```shell
-pip install git+https://github.com/bennyrock20/python-sri-sdk.git
+pip install sri
 ```
 
 ## Usage
