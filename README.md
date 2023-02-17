@@ -17,6 +17,7 @@ This is not an official SDK, it is a personal project that I use in my company, 
 - pydantic 1.10.4
 - zeep 4.2.1
 - jinga 3.1.2
+- [WeasyPrint](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation)
 
 ## Installation
 
@@ -116,6 +117,7 @@ print(authorized, m)
 
 # Todo
 
+- [ ] VALIDACIÓN DE CERTIFICADO
 - [ ] VALIDACIÓN DE TOTAL DE FACTURA
 - [ ] ENVÍO POR LOTE
 - [ ] COMPROBANTE RETENCIÓN

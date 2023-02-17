@@ -1,5 +1,5 @@
-from bill.sri import SRI
-from datetime import date, timedelta
+from src.sri import SRI
+from datetime import date, timedelta, datetime
 import os
 
 
@@ -17,12 +17,13 @@ def main():
         emission_date=date.today() - timedelta(days=38),
         document_type="01",
         environment="1",
-        serie="001001",
+        logo="./logo.png",
         company_ruc="0105527386001",
         billing_name="QUILLAY BRAVO VICTOR MANUEL",
         company_name="CREDI-OFERTAS",
         company_address="Manuel Moreno y Canaverales",
-        matriz_address="Manuel Moreno y Canaverales",
+        company_phone="2626290073",
+        main_address="Manuel Moreno y Canaverales",
         numeric_code="00000001",
         company_contribuyente_especial="5368",
         company_obligado_contabilidad="SI",
@@ -30,9 +31,12 @@ def main():
         point_emission="001",
         emission_type="1",
         sequential="000000006",
-        customer_billing_name="Cliente",
+
+        customer_billing_name="Andres Bravo",
         customer_identification="1792146739001",
         customer_identification_type="04",
+        customer_email="info@rushdelivery.app",
+        customer_phone="0999999999",
         customer_address="Av. 6 de Diciembre y Av. 10 de Agosto",
         taxes=[
             {
@@ -61,6 +65,7 @@ def main():
                 "unit_price": "100",
                 "discount": "0",
                 "price_total_without_tax": "100",
+                "total_price": "112",
                 "taxes": [
                     {
                         "code": "2",
@@ -86,11 +91,13 @@ def main():
 
     # res = bill.get_xml_signed()
 
-    valid, m = bill.validate_sri()
-    print(valid, m)
+    bill.get_pdf(authorization_date=datetime.now())
 
-    authorized, m = bill.get_authorization()
-    print(authorized, m)
+    # valid, m = bill.validate_sri()
+    # print(valid, m)
+
+    # authorized, m = bill.get_authorization()
+    # print(authorized, m)
 
 
 if __name__ == "__main__":
