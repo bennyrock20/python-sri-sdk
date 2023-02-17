@@ -10,7 +10,7 @@ from typing import List, Literal
 
 import zeep
 from OpenSSL import crypto
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoader
 from lxml import etree
 from pydantic import BaseModel, constr
 from signxml import DigestAlgorithm
@@ -186,8 +186,12 @@ class SRI(BaseModel):
         Function to get the xml of the electronic invoice
         """
 
+        from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+        loader = FileSystemLoader([os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
+
         loader = Environment(
-            loader=PackageLoader("bill", "templates"), autoescape=select_autoescape()
+            loader=loader, autoescape=select_autoescape()
         )
 
         access_key = self.__get_access_key()
