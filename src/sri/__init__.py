@@ -274,7 +274,7 @@ class SRI(BaseModel):
 
         response = client.service.autorizacionComprobante(access_key)
 
-        authorized = response["autorizaciones"]["autorizacion"][0]["estado"] == "AUTORIZADO"
+        authorized = response["autorizaciones"]["autorizacion"][0]["estado"] == "AUTORIZADO" if response["autorizaciones"] else False
 
         return authorized, response
 
