@@ -1,3 +1,3 @@
-#!/bin/zsh
+#!/bin/bash
 
-python3 -m build
+pipenv run python -m build && pipenv run python -m twine upload --repository testpypi dist/*
