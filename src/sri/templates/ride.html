@@ -85,9 +85,9 @@
                 <span class="form-company" style="font-weight: bold;">Teléfono:</span>
                 <span class="form-company">{{ bill.company_phone }}</span>
             </div>
-            <div style="margin-top: 5px">
-                 REGIMEN GENERAL
-            </div>
+<!--            <div style="margin-top: 5px">-->
+<!--                 REGIMEN GENERAL-->
+<!--            </div>-->
             <div>
                 <span class="form-company" style="font-weight: bold;">Obligado a llevar contabilidad:</span>
                 <span class="form-company">
@@ -126,11 +126,12 @@
         </div>
         <div style="margin-top: 10px;">
             <span class="form-invoice" style="font-weight: bold;">AMBIENTE:</span>
-            <span class="form-invoice">{{ bill.environment.name }}</span>
+            <span class="form-invoice">
+                {% if bill.environment.value == "1"%} PRUEBAS {%else%} PRODUCCION {% endif %}
         </div>
         <div style="margin-top: 10px;">
             <span class="form-invoice" style="font-weight: bold;">EMISIÓN:</span>
-            <span class="form-invoice">{{ bill.emission_type.value }}</span>
+            <span class="form-invoice">{% if bill.emission_type.value == "1"%}NORMAL{% endif %}</span>
         </div>
         <div style="margin-top: 10px;">
             <span style="font-size: 10px">CLAVE DE ACCESO:</span>
@@ -204,7 +205,7 @@
 </div>
 
 <div class="box01" style="margin-top: 10px">
-    <div class="box02" style="width: 55% !important;">
+    <div class="box02" style="width: 55% !important; height: 100%">
         <div>
             <span style="font-size: 10px">INFORMACIÓN ADICIONAL:</span>
             <div style="margin-top: 5px;">
@@ -217,29 +218,29 @@
             </div>
         </div>
 
-        <div style="margin-top: 20px">
-            <table style="width: 100%">
-                <thead>
-                    <tr>
-                        <td style="font-size: 10px">Forma de pago</td>
-                        <td style="text-align: center; font-size: 10px">Valor</td>
-                        <td style="text-align: center; font-size: 10px">Tiempo</td>
-                        <td style="text-align: center; font-size: 10px">Plazo</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for payment in bill.payments %}
-                        <tr>
-                            <td style="font-size: 8px">{{ payment.payment_method.value }}</td>
-                            <td style="text-align: center; font-size: 10px">{{ payment.total }}</td>
-                            <td style="text-align: center; font-size: 10px">{{ payment.unit_time.value }}</td>
-                            <td style="text-align: center; font-size: 10px">{{ payment.terms }}</td>
-                        </tr>
-                    {% endfor %}
+<!--        <div style="margin-top: 20px">-->
+<!--            <table style="width: 100%">-->
+<!--                <thead>-->
+<!--                    <tr>-->
+<!--                        <td style="font-size: 10px">Forma de pago</td>-->
+<!--                        <td style="text-align: center; font-size: 10px">Valor</td>-->
+<!--                        <td style="text-align: center; font-size: 10px">Tiempo</td>-->
+<!--                        <td style="text-align: center; font-size: 10px">Plazo</td>-->
+<!--                    </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                    {% for payment in bill.payments %}-->
+<!--                        <tr>-->
+<!--                            <td style="font-size: 8px">{% if payment.payment_method == "01" %}{% endif %}</td>-->
+<!--                            <td style="text-align: center; font-size: 10px">{{ payment.total }}</td>-->
+<!--                            <td style="text-align: center; font-size: 10px">{{ payment.unit_time.value }}</td>-->
+<!--                            <td style="text-align: center; font-size: 10px">{{ payment.terms }}</td>-->
+<!--                        </tr>-->
+<!--                    {% endfor %}-->
 
-                </tbody>
-            </table>
-        </div>
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
     </div>
 
     <div style="width: 45%;">
