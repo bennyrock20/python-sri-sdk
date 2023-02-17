@@ -305,10 +305,8 @@ class SRI(BaseModel):
         Function to get the barcode image of the electronic invoice
         """
         rv = BytesIO()
-        # EAN13(str(100000902922), writer=SVGWriter()).write(rv)
         Code39(str(self.get_access_key()), writer=SVGWriter()).write(rv)
 
-        # convert to base 64
         return base64.b64encode(rv.getvalue()).decode("utf-8")
 
     def get_logo_base64(self):
