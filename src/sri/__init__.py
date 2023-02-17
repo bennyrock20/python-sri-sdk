@@ -127,7 +127,7 @@ class SRI(BaseModel):
         elif self.environment.value == "2":
             return "https://cel.sri.gob.ec/comprobantes-electronicos-ws/AutorizacionComprobantesOffline?wsdl"
 
-    def __get_access_key(self):
+    def get_access_key(self):
         """
         Function to generate the access key
         """
@@ -194,7 +194,7 @@ class SRI(BaseModel):
             loader=loader, autoescape=select_autoescape()
         )
 
-        access_key = self.__get_access_key()
+        access_key = self.get_access_key()
 
         render = loader.get_template("factura_V1.1.0.xml").render(
             {
@@ -270,13 +270,19 @@ class SRI(BaseModel):
 
         client = zeep.Client(wsdl=self.__get_authorization_url())
 
-        access_key = self.__get_access_key()
+        access_key = self.get_access_key()
 
         response = client.service.autorizacionComprobante(access_key)
 
         authorized = response["autorizaciones"]["autorizacion"][0]["estado"] == "AUTORIZADO"
 
         return authorized, response
+
+    def get_pdf(self):
+        """
+        Function to get the pdf of the electronic invoice
+        """
+        pass
 
     def get_qr(self):
         """
