@@ -49,7 +49,12 @@ class MyXAdESSigner(XAdESSigner, XMLSigner):
 
             issuer_name_bytes = loaded_cert.get_issuer()
 
-            issuer_name.text="CN=AUTORIDAD DE CERTIFICACION SUBCA-2 SECURITY DATA,OU=ENTIDAD DE CERTIFICACION DE INFORMACION,O=SECURITY DATA S.A. 2,C=EC "
+            cn = issuer_name_bytes.__getattr__("CN")
+            ou = issuer_name_bytes.__getattr__("OU")
+            o = issuer_name_bytes.__getattr__("O")
+            c = issuer_name_bytes.__getattr__("C")
+
+            issuer_name.text = f"CN={cn},OU={ou},O={o},C={c}"
 
             # Add Issuer Serial Number
             issuer_serial_number = loaded_cert.get_serial_number()
