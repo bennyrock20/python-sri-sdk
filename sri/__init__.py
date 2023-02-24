@@ -19,7 +19,13 @@ from signxml import DigestAlgorithm
 from signxml.xades import (
     XAdESDataObjectFormat,
 )
-from typing import List, Literal, Optional
+from typing import List, Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
+
 from weasyprint import HTML
 
 from .XAdESSigner import MyXAdESSigner
@@ -34,11 +40,11 @@ from .enum import (
     IdentificationTypeEnum,
 )
 
-loader = FileSystemLoader([os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")])
-
-loader = Environment(
-    loader=loader, autoescape=select_autoescape()
+loader = FileSystemLoader(
+    [os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")]
 )
+
+loader = Environment(loader=loader, autoescape=select_autoescape())
 
 
 class TaxItem(BaseModel):
@@ -154,15 +160,15 @@ class SRI(BaseModel):
         code_number = str(self.numeric_code).zfill(8)
 
         key = (
-                str(self.emission_date.strftime("%d%m%Y"))
-                + str(self.document_type.value)
-                + str(self.company_ruc)
-                + str(self.environment.value)
-                + str(self.establishment)
-                + str(self.point_emission)
-                + str(self.sequential)
-                + str(code_number)
-                + str(self.emission_type.value)
+            str(self.emission_date.strftime("%d%m%Y"))
+            + str(self.document_type.value)
+            + str(self.company_ruc)
+            + str(self.environment.value)
+            + str(self.establishment)
+            + str(self.point_emission)
+            + str(self.sequential)
+            + str(code_number)
+            + str(self.emission_type.value)
         )
 
         digit_verifier = SRI.generate_digit_verifier(key)
@@ -182,7 +188,7 @@ class SRI(BaseModel):
 
         while x > 0:
             x = x - 1
-            number = int(key[x: x + 1])
+            number = int(key[x : x + 1])
             total = total + (number * factor)
 
             if factor == 7:
@@ -222,7 +228,9 @@ class SRI(BaseModel):
         Function to sign the electronic invoice
         """
 
-        p12 = crypto.load_pkcs12(open(self.certificate, "rb").read(), self.password.encode("utf-8"))
+        p12 = crypto.load_pkcs12(
+            open(self.certificate, "rb").read(), self.password.encode("utf-8")
+        )
 
         # PEM formatted private key
         key = crypto.dump_privatekey(crypto.FILETYPE_PEM, p12.get_privatekey())
@@ -239,7 +247,6 @@ class SRI(BaseModel):
             c14n_algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
             signature_algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1",
             digest_algorithm=DigestAlgorithm.SHA1,
-
         )
 
         doc = self.get_xml().encode("utf-8")
@@ -253,11 +260,15 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        path_xml = os.path.join(os.getcwd(), 'signed.xml')
-        with open(path_xml, 'w') as f:
-            f.write(etree.tostring(signed_doc, pretty_print=True, encoding="unicode", method='xml'))
+        path_xml = os.path.join(os.getcwd(), "signed.xml")
+        with open(path_xml, "w") as f:
+            f.write(
+                etree.tostring(
+                    signed_doc, pretty_print=True, encoding="unicode", method="xml"
+                )
+            )
 
-        return open(path_xml, 'r').read()
+        return open(path_xml, "r").read()
 
     def validate_sri(self):
         """
@@ -285,7 +296,11 @@ class SRI(BaseModel):
 
         response = client.service.autorizacionComprobante(access_key)
 
-        authorized = response["autorizaciones"]["autorizacion"][0]["estado"] == "AUTORIZADO" if response["autorizaciones"] else False
+        authorized = (
+            response["autorizaciones"]["autorizacion"][0]["estado"] == "AUTORIZADO"
+            if response["autorizaciones"]
+            else False
+        )
 
         return authorized, response
 
@@ -323,19 +338,37 @@ class SRI(BaseModel):
         """
         Function to get the subtotal 12 of the electronic invoice
         """
-        return sum([float(i.value) for i in self.taxes if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE])
+        return sum(
+            [
+                float(i.value)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
+            ]
+        )
 
     def get_subtotal_0(self):
         """
         Function to get the subtotal 0 of the electronic invoice
         """
-        return sum([float(i.value) for i in self.taxes if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO])
+        return sum(
+            [
+                float(i.value)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
+            ]
+        )
 
     def get_subtotal_no_tax(self):
         """
         Function to get the subtotal no iva of the electronic invoice
         """
-        return sum([float(i.value) for i in self.taxes if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX])
+        return sum(
+            [
+                float(i.value)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
+            ]
+        )
 
     def get_total_tax(self):
         """
@@ -355,7 +388,7 @@ class SRI(BaseModel):
             }
         )
 
-        file = os.path.join(self.get_tmp_dir(),  f"{self.get_access_key()}.pdf")
+        file = os.path.join(self.get_tmp_dir(), f"{self.get_access_key()}.pdf")
 
         HTML(string=html).write_pdf(file)
 
