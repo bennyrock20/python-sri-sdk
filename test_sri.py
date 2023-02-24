@@ -1,41 +1,16 @@
-# SRI 
-
-SRI provides a simple way to interact with the SRI API.
-
-## Disclaimer
-
-This is not an official SDK, it is a personal project that I use in my company, I am not responsible for any damage that this library may cause.
-
-## SUPPORTED DOCUMENTS
-
-- [x] FACTURA
-
-## Dependencies
-
-- Python 3.7+
-- signxml 3.0.0
-- pydantic 1.10.4
-- zeep 4.2.1
-- jinga 3.1.2
-- [WeasyPrint](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation)
-
-## Installation
-
-```shell
-pip install sri
-```
-
-## Usage
-
-```python
-from datetime import date
-from sri import SRI
 from sri.enum import TaxCodeEnum, PercentageTaxCodeEnum, PaymentMethodEnum
 
-cert_path_file = "certificado.p12"
-password = "12345678"
 
-bill = SRI(
+class TestSRI:
+    def test_totals(self):
+        """
+        Test the SRI SDK
+        """
+
+        from sri import SRI
+        from datetime import date
+
+        bill = SRI(
             logo="logo.png",
             emission_date=date.today(),
             document_type="01",
@@ -165,40 +140,37 @@ bill = SRI(
             ],
             # total_discount=0,
             tips=0,
-            certificate=cert_path_file,
-            password=password,
+            # total_without_tax=100,
+            # grand_total=112,
+            certificate="certificado.p12",
+            password="setup132",
         )
 
-# Send the bill to the SRI
-valid, m = bill.validate_sri()
-print(valid, m)
+        # Test Total Tax 0%
+        assert bill.get_subtotal_0() == 100
 
-# Get the authorization
-authorized, m = bill.get_authorization()
-print(authorized, m)
+        # Test Total Tax 12%
+        assert bill.get_subtotal_12() == 22.50
 
-```
-# Features
+        # Test Total Tax 14%
+        assert bill.get_subtotal_14() == 37.50
 
-- [x] FACTURA
+        # Test Total No Tax
+        assert bill.get_subtotal_tax_exempt() == 30
 
-# Todo
+        # Test Total Tax Exempt
+        assert bill.get_subtotal_no_tax() == 15
 
-- [ ] VALIDACIÓN DE CERTIFICADO
-- [ ] VALIDACIÓN DE TOTAL DE FACTURA
-- [ ] ENVÍO POR LOTE
-- [ ] COMPROBANTE RETENCIÓN
-- [ ] GUÍA DE REMISIÓN
-- [ ] NOTA DE CRÉDITO
-- [ ] NOTA DE DÉBITO
+        # Validate total without tax (Sum all price_total_without_tax 100 + 22)
 
-## Contributing
+        assert bill.total_without_tax == 205
 
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
+        # Validate  total_tax
 
-Please make sure to update tests as appropriate.
+        assert bill.total_tax == 7.95
 
-## License
+        # Validate grand total sum total_without_tax + total_tax (205 + 7.95)
 
-[MIT](https://choosealicense.com/licenses/mit/)
+        assert bill.grand_total == 212.95
+
+        assert bill.total_discount == 0

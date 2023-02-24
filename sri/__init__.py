@@ -14,7 +14,7 @@ from barcode import Code39
 from barcode.writer import SVGWriter
 from jinja2 import Environment, select_autoescape, FileSystemLoader
 from lxml import etree
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, ValidationError, validator
 from signxml import DigestAlgorithm
 from signxml.xades import (
     XAdESDataObjectFormat,
@@ -54,10 +54,25 @@ class TaxItem(BaseModel):
 
     code: TaxCodeEnum
     tax_percentage_code: PercentageTaxCodeEnum
-    additional_discount: str
-    tarifa: str
-    base: str
-    value: str
+    additional_discount: float
+    base: float
+    value: float
+
+    @property
+    def tarifa(self):
+        if self.tax_percentage_code == PercentageTaxCodeEnum.ZERO:
+            return 0
+        elif self.tax_percentage_code == PercentageTaxCodeEnum.TWELVE:
+            return 12
+
+        elif self.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN:
+            return 14
+
+        elif self.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX:
+            return 0
+
+        elif self.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT:
+            return 0
 
 
 class PaymentItem(BaseModel):
@@ -66,7 +81,7 @@ class PaymentItem(BaseModel):
     """
 
     payment_method: PaymentMethodEnum
-    total: str
+    total: float
     terms: int
     unit_time: UnitTimeEnum
 
@@ -79,12 +94,12 @@ class LineItem(BaseModel):
     code: str
     aux_code: str
     description: str
-    quantity: str
-    unit_price: str
-    discount: str
-    price_total_without_tax: str
+    quantity: int
+    unit_price: float
+    discount: float
+    price_total_without_tax: float
     taxes: List[TaxItem]
-    total_price: str
+    total_price: float
 
 
 class SRI(BaseModel):
@@ -94,18 +109,19 @@ class SRI(BaseModel):
 
     environment: EnvironmentEnum
     document_type: DocumentTypeEnum = DocumentTypeEnum.INVOICE
-    main_address: str
+
     logo: str
     billing_name: constr(min_length=3, max_length=300)
     company_name: constr(min_length=3, max_length=300)
+    main_address: str
     company_ruc: constr(min_length=13, max_length=13)
     company_phone: Optional[str] = None
-    customer_email: Optional[str] = None
-    establishment: constr(min_length=3, max_length=3)
-    point_emission: constr(min_length=3, max_length=3)
     company_address: str
     company_contribuyente_especial: str
     company_obligado_contabilidad: Literal["SI", "NO"]
+
+    establishment: constr(min_length=3, max_length=3)
+    point_emission: constr(min_length=3, max_length=3)
     emission_date: date
     sequential: constr(min_length=9, max_length=9)
     numeric_code: constr(min_length=8, max_length=8)
@@ -115,14 +131,13 @@ class SRI(BaseModel):
     customer_identification: str
     customer_identification_type: IdentificationTypeEnum
     customer_address: str
+    customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
 
-    taxes: List[TaxItem]
+    # taxes: List[TaxItem]
     payments: List[PaymentItem]
     lines_items: List[LineItem]
-    total_without_tax: float
-    total_discount: float
     tips: float
-    grand_total: float
     certificate: str
     password: str
 
@@ -160,15 +175,15 @@ class SRI(BaseModel):
         code_number = str(self.numeric_code).zfill(8)
 
         key = (
-            str(self.emission_date.strftime("%d%m%Y"))
-            + str(self.document_type.value)
-            + str(self.company_ruc)
-            + str(self.environment.value)
-            + str(self.establishment)
-            + str(self.point_emission)
-            + str(self.sequential)
-            + str(code_number)
-            + str(self.emission_type.value)
+                str(self.emission_date.strftime("%d%m%Y"))
+                + str(self.document_type.value)
+                + str(self.company_ruc)
+                + str(self.environment.value)
+                + str(self.establishment)
+                + str(self.point_emission)
+                + str(self.sequential)
+                + str(code_number)
+                + str(self.emission_type.value)
         )
 
         digit_verifier = SRI.generate_digit_verifier(key)
@@ -188,7 +203,7 @@ class SRI(BaseModel):
 
         while x > 0:
             x = x - 1
-            number = int(key[x : x + 1])
+            number = int(key[x: x + 1])
             total = total + (number * factor)
 
             if factor == 7:
@@ -334,17 +349,13 @@ class SRI(BaseModel):
 
         return encoded_string.decode("utf-8")
 
-    def get_subtotal_12(self):
+    @property
+    def taxes(self) -> List[TaxItem]:
         """
-        Function to get the subtotal 12 of the electronic invoice
+        Return taxes of each line item
         """
-        return sum(
-            [
-                float(i.value)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
-            ]
-        )
+        for line in self.lines_items:
+            yield from line.taxes
 
     def get_subtotal_0(self):
         """
@@ -352,9 +363,33 @@ class SRI(BaseModel):
         """
         return sum(
             [
-                float(i.value)
+                float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
+            ]
+        )
+
+    def get_subtotal_12(self):
+        """
+        Function to get the subtotal 12 of the electronic invoice from each line item
+        """
+        return sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
+            ]
+        )
+
+    def get_subtotal_14(self):
+        """
+        Function to get the subtotal 14 of the electronic invoice
+        """
+        return sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN
             ]
         )
 
@@ -364,9 +399,21 @@ class SRI(BaseModel):
         """
         return sum(
             [
-                float(i.value)
+                float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
+            ]
+        )
+
+    def get_subtotal_tax_exempt(self):
+        """
+        Function to get the subtotal no iva of the electronic invoice
+        """
+        return sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT
             ]
         )
 
@@ -399,3 +446,31 @@ class SRI(BaseModel):
         Function to get the qr of the electronic invoice
         """
         raise NotImplementedError
+
+    @property
+    def total_discount(self):
+        """
+        Function to validate the total discount
+        """
+        return sum([line.discount for line in self.lines_items])
+
+    @property
+    def total_without_tax(self):
+        """
+        Function to validate the total without tax
+        """
+        return sum([line.price_total_without_tax for line in self.lines_items])
+
+    @property
+    def total_tax(self):
+        """
+        Function to validate the total without tax
+        """
+        return sum([line.value for line in self.taxes])
+
+    @property
+    def grand_total(self):
+        """
+        Function to validate the grand total
+        """
+        return self.total_without_tax + self.total_tax
