@@ -285,7 +285,7 @@ class SRI(BaseModel):
         #
         # return open(path_xml, "r").read()
 
-        etree.tostring(
+        return etree.tostring(
             signed_doc, pretty_print=True, encoding="unicode", method="xml"
         )
 
