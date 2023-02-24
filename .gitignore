@@ -7,3 +7,4 @@ signed.xml
 build
 dist
 tmp
+*.pdf

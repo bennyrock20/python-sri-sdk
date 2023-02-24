@@ -275,15 +275,19 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        path_xml = os.path.join(os.getcwd(), "signed.xml")
-        with open(path_xml, "w") as f:
-            f.write(
-                etree.tostring(
-                    signed_doc, pretty_print=True, encoding="unicode", method="xml"
-                )
-            )
+        # path_xml = os.path.join(os.getcwd(), "signed.xml")
+        # with open(path_xml, "w") as f:
+        #     f.write(
+        #         etree.tostring(
+        #             signed_doc, pretty_print=True, encoding="unicode", method="xml"
+        #         )
+        #     )
+        #
+        # return open(path_xml, "r").read()
 
-        return open(path_xml, "r").read()
+        etree.tostring(
+            signed_doc, pretty_print=True, encoding="unicode", method="xml"
+        )
 
     def validate_sri(self):
         """
@@ -435,11 +439,14 @@ class SRI(BaseModel):
             }
         )
 
-        file = os.path.join(self.get_tmp_dir(), f"{self.get_access_key()}.pdf")
+        # Create a file object
+
+        #  bytes-like object
+        file = BytesIO()
 
         HTML(string=html).write_pdf(file)
 
-        return file
+        return file.getbuffer()
 
     def get_qr(self):
         """
