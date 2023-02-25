@@ -23,7 +23,7 @@
         <direccionComprador>{{  bill.customer_address }}</direccionComprador>
         <totalSinImpuestos>{{ bill.total_without_tax }}</totalSinImpuestos>
         <totalDescuento>{{ bill.total_discount }}</totalDescuento>
-        <totalConImpuestos>{% for i in bill.taxes %}
+        <totalConImpuestos>{% for i in bill.grouped_taxes %}
             <totalImpuesto>
                 <codigo>{{ i.code.value }}</codigo>
                 <codigoPorcentaje>{{ i.tax_percentage_code.value }}</codigoPorcentaje>

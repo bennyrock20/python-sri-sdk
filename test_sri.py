@@ -1,7 +1,36 @@
 from sri.enum import TaxCodeEnum, PercentageTaxCodeEnum, PaymentMethodEnum
+from datetime import date
 
 
 class TestSRI:
+
+    def get_bill_header(self):
+        return {
+            "emission_date": date.today(),
+            "document_type": "01",
+            "environment": "1",
+            "serie": "001001",
+            "company_ruc": "0100067500001",
+            "billing_name": "Rush Soft",
+            "company_name": "Rush Delivery",
+            "company_address": "Manuel Moreno y Canaverales",
+            "main_address": "Manuel Moreno y Canaverales",
+            "numeric_code": "00000001",
+            "company_contribuyente_especial": "5368",
+            "company_obligado_contabilidad": "SI",
+            "company_phone": "+59398888888",
+            "establishment": "001",
+            "point_emission": "001",
+            "emission_type": "1",
+            "sequential": "000000005",
+            "customer_billing_name": "Jhon Doe",
+            "customer_identification": "1792146739001",
+            "customer_identification_type": "04",
+            "customer_address": "Av. 6 de Diciembre y Av. 10 de Agosto",
+            "customer_email": 'info@emami.com',
+            "customer_phone": "+59398569277",
+        }
+
     def test_totals(self):
         """
         Test the SRI SDK
@@ -11,29 +40,7 @@ class TestSRI:
         from datetime import date, datetime
 
         bill = SRI(
-            emission_date=date.today(),
-            document_type="01",
-            environment="1",
-            serie="001001",
-            company_ruc="0100067500001",
-            billing_name="Rush Soft",
-            company_name="Rush Delivery",
-            company_address="Manuel Moreno y Canaverales",
-            main_address="Manuel Moreno y Canaverales",
-            numeric_code="00000001",
-            company_contribuyente_especial="5368",
-            company_obligado_contabilidad="SI",
-            company_phone="+59398888888",
-            establishment="001",
-            point_emission="001",
-            emission_type="1",
-            sequential="000000005",
-            customer_billing_name="Jhon Doe",
-            customer_identification="1792146739001",
-            customer_identification_type="04",
-            customer_address="Av. 6 de Diciembre y Av. 10 de Agosto",
-            customer_email="info@rushdelivery.app",
-            customer_phone="+59398569277",
+            **self.get_bill_header(),
             lines_items=[
                 {
                     "code": "0001",
@@ -178,3 +185,74 @@ class TestSRI:
 
         with open("test.pdf", "wb") as f:
             f.write(pdf_bytes)
+
+    def test_total_con_impuestos(self):
+        """
+        Test method that return taxes grouped by tax percentage
+        """
+
+        from sri import SRI
+
+        line_item_1 = {
+            "code": "0001",
+            "aux_code": "ABC-2343",
+            "description": "Producto 1 - (12%)",
+            "quantity": 1,
+            "unit_price": 110,
+            "discount": 10,
+            "price_total_without_tax": 100,
+            "total_price": 100,
+            "taxes": [
+                {
+                    "code": TaxCodeEnum.IVA,
+                    "tax_percentage_code": PercentageTaxCodeEnum.TWELVE,
+                    "base": 100,
+                    "additional_discount": 0,
+                    "value": 12,
+                },
+            ],
+        }
+
+        line_item_2 = {
+            "code": "0002",
+            "aux_code": "ABC-2344",
+            "description": "Producto 2 (12%)",
+            "quantity": 5,
+            "unit_price": 4.50,
+            "discount": 0,
+            "price_total_without_tax": 22.50,
+            "total_price": 25.50,
+            "taxes": [
+                {
+                    "code": TaxCodeEnum.IVA,
+                    "tax_percentage_code": PercentageTaxCodeEnum.TWELVE,
+                    "base": 22.50,
+                    "additional_discount": 0,
+                    "value": 2.70,
+                },
+            ],
+        }
+
+        bill = SRI(
+            **self.get_bill_header(),
+            lines_items=[
+                line_item_1,
+                line_item_2,
+            ],
+            payments=[],
+            tips=0,
+        )
+
+        tax_by_code = bill.grouped_taxes
+
+        assert len(tax_by_code) == 1
+
+        first = tax_by_code[0]
+
+        assert first.code == TaxCodeEnum.IVA
+        assert first.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
+        assert first.base == 122.50
+        assert first.additional_discount == 0
+        assert first.value == 14.70
+
+

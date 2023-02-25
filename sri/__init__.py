@@ -272,7 +272,7 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        path_xml = os.path.join(os.getcwd(), "signed.xml")
+        path_xml = os.path.join("tmp", "x.xml")
         with open(path_xml, "w") as f:
             f.write(
                 etree.tostring(
@@ -286,7 +286,7 @@ class SRI(BaseModel):
             signed_doc, pretty_print=True, encoding="unicode", method="xml"
         )
 
-    def validate_sri(self,  certificate_file_path: str, password: str):
+    def validate_sri(self, certificate_file_path: str, password: str):
         """
         Function to validate the electronic invoice in the SRI
         """
@@ -340,7 +340,7 @@ class SRI(BaseModel):
 
         return base64.b64encode(rv.getvalue()).decode("utf-8")
 
-    def get_logo_base64(self, logo_file_path: str= None):
+    def get_logo_base64(self, logo_file_path: str = None):
         """
         Function to get the logo of the electronic invoice
         """
@@ -352,81 +352,7 @@ class SRI(BaseModel):
 
         return encoded_string.decode("utf-8")
 
-    @property
-    def taxes(self) -> List[TaxItem]:
-        """
-        Return taxes of each line item
-        """
-        for line in self.lines_items:
-            yield from line.taxes
-
-    def get_subtotal_0(self):
-        """
-        Function to get the subtotal 0 of the electronic invoice
-        """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
-            ]
-        ),2)
-
-    def get_subtotal_12(self):
-        """
-        Function to get the subtotal 12 of the electronic invoice from each line item
-        """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
-            ]
-        ),2)
-
-    def get_subtotal_14(self):
-        """
-        Function to get the subtotal 14 of the electronic invoice
-        """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN
-            ]
-        ), 2)
-
-    def get_subtotal_no_tax(self):
-        """
-        Function to get the subtotal no iva of the electronic invoice
-        """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
-            ]
-        ),2)
-
-    def get_subtotal_tax_exempt(self):
-        """
-        Function to get the subtotal no iva of the electronic invoice
-        """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT
-            ]
-        ),2)
-
-    def get_total_tax(self):
-        """
-        Function to get the total tax of the electronic invoice
-        """
-        return round(sum([float(i.value) for i in self.taxes]), 2)
-
-    def get_pdf(self, authorization_date: datetime,  logo_file_path: str = None):
+    def get_pdf(self, authorization_date: datetime, logo_file_path: str = None):
         """
         Function to get the pdf of the electronic invoice
         """
@@ -453,6 +379,108 @@ class SRI(BaseModel):
         Function to get the qr of the electronic invoice
         """
         raise NotImplementedError
+
+    @property
+    def taxes(self) -> List[TaxItem]:
+        """
+        Return taxes of each line item
+        """
+        for line in self.lines_items:
+            yield from line.taxes
+
+    @property
+    def grouped_taxes(self) -> List[TaxItem]:
+        """
+        Create a list of taxes grouped by tax percentage code
+        """
+
+        from itertools import groupby
+
+        # Group the tax items by code and tax_percentage_code
+        grouped_tax_items = []
+        for (code, tax_percentage_code), group in groupby(self.taxes, key=lambda x: (x.code, x.tax_percentage_code)):
+            # Convert the group iterator to a list and calculate the total value for the group
+            group_list = list(group)
+            total_value = sum(item.value for item in group_list)
+            total_base = sum(item.base for item in group_list)
+            total_additional_discount = sum(item.additional_discount for item in group_list)
+
+            # Create a new TaxItem object with the group's attributes and total value
+            grouped_item = TaxItem(code=code, tax_percentage_code=tax_percentage_code,
+                                   additional_discount=total_additional_discount,
+                                   base=total_base,
+                                   value=total_value)
+
+            # Add the new item to the list of grouped tax items
+            grouped_tax_items.append(grouped_item)
+
+        return grouped_tax_items
+
+    def get_subtotal_0(self):
+        """
+        Function to get the subtotal 0 of the electronic invoice
+        """
+        return round(sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
+            ]
+        ), 2)
+
+    def get_subtotal_12(self):
+        """
+        Function to get the subtotal 12 of the electronic invoice from each line item
+        """
+        return round(sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
+            ]
+        ), 2)
+
+    def get_subtotal_14(self):
+        """
+        Function to get the subtotal 14 of the electronic invoice
+        """
+        return round(sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN
+            ]
+        ), 2)
+
+    def get_subtotal_no_tax(self):
+        """
+        Function to get the subtotal no iva of the electronic invoice
+        """
+        return round(sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
+            ]
+        ), 2)
+
+    def get_subtotal_tax_exempt(self):
+        """
+        Function to get the subtotal no iva of the electronic invoice
+        """
+        return round(sum(
+            [
+                float(i.base)
+                for i in self.taxes
+                if i.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT
+            ]
+        ), 2)
+
+    def get_total_tax(self):
+        """
+        Function to get the total tax of the electronic invoice
+        """
+        return round(sum([float(i.value) for i in self.taxes]), 2)
 
     @property
     def total_discount(self):
