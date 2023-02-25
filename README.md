@@ -36,35 +36,37 @@ cert_path_file = "certificado.p12"
 password = "12345678"
 
 bill = SRI(
-            logo="logo.png",
             emission_date=date.today(),
             document_type="01",
             environment="1",
             serie="001001",
             company_ruc="0100067500001",
-            billing_name="Razon Social",
-            company_name="Nombre Comercial",
+            billing_name="Rush Soft",
+            company_name="Rush Delivery",
             company_address="Manuel Moreno y Canaverales",
             main_address="Manuel Moreno y Canaverales",
             numeric_code="00000001",
             company_contribuyente_especial="5368",
             company_obligado_contabilidad="SI",
+            company_phone="+59398888888",
             establishment="001",
             point_emission="001",
             emission_type="1",
             sequential="000000005",
-            customer_billing_name="Cliente",
+            customer_billing_name="Jhon Doe",
             customer_identification="1792146739001",
             customer_identification_type="04",
             customer_address="Av. 6 de Diciembre y Av. 10 de Agosto",
+            customer_email="info@rushdelivery.app",
+            customer_phone="+59398569277",
             lines_items=[
                 {
                     "code": "0001",
                     "aux_code": "ABC-2343",
                     "description": "Producto 1 - No aplica IVA",
                     "quantity": 1,
-                    "unit_price": 100,
-                    "discount": 0,
+                    "unit_price": 110,
+                    "discount": 10,
                     "price_total_without_tax": 100,
                     "total_price": 100,
                     "taxes": [
@@ -163,14 +165,14 @@ bill = SRI(
                     "unit_time": "dias",
                 },
             ],
-            # total_discount=0,
             tips=0,
-            certificate=cert_path_file,
-            password=password,
         )
 
 # Send the bill to the SRI
-valid, m = bill.validate_sri()
+valid, m = bill.validate_sri(
+    certificate_file_path=cert_path_file,
+    password=password,
+)
 print(valid, m)
 
 # Get the authorization

@@ -110,7 +110,6 @@ class SRI(BaseModel):
     environment: EnvironmentEnum
     document_type: DocumentTypeEnum = DocumentTypeEnum.INVOICE
 
-    logo: str
     billing_name: constr(min_length=3, max_length=300)
     company_name: constr(min_length=3, max_length=300)
     main_address: str
@@ -138,8 +137,6 @@ class SRI(BaseModel):
     payments: List[PaymentItem]
     lines_items: List[LineItem]
     tips: float
-    certificate: str
-    password: str
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -238,13 +235,13 @@ class SRI(BaseModel):
 
         return render.replace("\n", "")
 
-    def get_xml_signed(self):
+    def get_xml_signed(self, certificate_file_path: str, password: str):
         """
         Function to sign the electronic invoice
         """
 
         p12 = crypto.load_pkcs12(
-            open(self.certificate, "rb").read(), self.password.encode("utf-8")
+            open(certificate_file_path, "rb").read(), password.encode("utf-8")
         )
 
         # PEM formatted private key
@@ -289,14 +286,14 @@ class SRI(BaseModel):
             signed_doc, pretty_print=True, encoding="unicode", method="xml"
         )
 
-    def validate_sri(self):
+    def validate_sri(self,  certificate_file_path: str, password: str):
         """
         Function to validate the electronic invoice in the SRI
         """
 
         client = zeep.Client(wsdl=self.__get_reception_url())
         # transform the xml to bytes
-        xml = self.get_xml_signed().encode("utf-8")
+        xml = self.get_xml_signed(certificate_file_path=certificate_file_path, password=password).encode("utf-8")
 
         response = client.service.validarComprobante(xml)
 
@@ -343,12 +340,12 @@ class SRI(BaseModel):
 
         return base64.b64encode(rv.getvalue()).decode("utf-8")
 
-    def get_logo_base64(self):
+    def get_logo_base64(self, logo_file_path: str):
         """
         Function to get the logo of the electronic invoice
         """
 
-        with open(self.logo, "rb") as image_file:
+        with open(logo_file_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
 
         return encoded_string.decode("utf-8")
@@ -427,7 +424,7 @@ class SRI(BaseModel):
         """
         return sum([float(i.value) for i in self.taxes])
 
-    def get_pdf(self, authorization_date: datetime):
+    def get_pdf(self, logo: str, authorization_date: datetime):
         """
         Function to get the pdf of the electronic invoice
         """
@@ -435,6 +432,7 @@ class SRI(BaseModel):
             {
                 "bill": self,
                 "authorization_date": authorization_date,
+                "logo_base64": self.get_logo_base64(logo),
                 # "barcode_image": self.get_barcode_image(),
             }
         )

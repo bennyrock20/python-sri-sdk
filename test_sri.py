@@ -11,7 +11,6 @@ class TestSRI:
         from datetime import date, datetime
 
         bill = SRI(
-            logo="logo.png",
             emission_date=date.today(),
             document_type="01",
             environment="1",
@@ -141,12 +140,7 @@ class TestSRI:
                     "unit_time": "dias",
                 },
             ],
-            # total_discount=0,
             tips=0,
-            # total_without_tax=100,
-            # grand_total=112,
-            certificate="certificado.p12",
-            password="setup132",
         )
 
         # Test Total Tax 0%
@@ -178,7 +172,9 @@ class TestSRI:
 
         assert bill.total_discount == 10
 
-        pdf_bytes = bill.get_pdf(datetime.now())
+        pdf_bytes = bill.get_pdf(
+            logo="logo.png",
+            authorization_date=datetime.now())
 
         with open("test.pdf", "wb") as f:
             f.write(pdf_bytes)

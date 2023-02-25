@@ -65,8 +65,8 @@
 <div class="box01">
     <div class="box02">
         <div style="text-align: center; margin-bottom: 10px">
-           {% if bill.logo %}
-             <img style="width: 300px;" src="data:image/png;base64,{{ bill.get_logo_base64()}}" alt="Red dot" />
+           {% if logo_base64 %}
+             <img style="width: 300px;" src="data:image/png;base64,{{ logo_base64 }}" alt=" " />
            {% else %}
                {{ bill.company_name }}
            {% endif %}
