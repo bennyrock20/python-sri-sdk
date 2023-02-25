@@ -64,7 +64,4 @@
             </impuestos>
         </detalle>{% endfor %}
     </detalles>
-    <tipoNegociable>
-        <correo>bill@rushdelivery.app</correo>
-    </tipoNegociable>
 </factura>
