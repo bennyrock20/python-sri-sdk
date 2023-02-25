@@ -272,14 +272,14 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        # path_xml = os.path.join(os.getcwd(), "signed.xml")
-        # with open(path_xml, "w") as f:
-        #     f.write(
-        #         etree.tostring(
-        #             signed_doc, pretty_print=True, encoding="unicode", method="xml"
-        #         )
-        #     )
-        #
+        path_xml = os.path.join(os.getcwd(), "signed.xml")
+        with open(path_xml, "w") as f:
+            f.write(
+                etree.tostring(
+                    signed_doc, pretty_print=True, encoding="unicode", method="xml"
+                )
+            )
+
         # return open(path_xml, "r").read()
 
         return etree.tostring(
@@ -340,10 +340,12 @@ class SRI(BaseModel):
 
         return base64.b64encode(rv.getvalue()).decode("utf-8")
 
-    def get_logo_base64(self, logo_file_path: str):
+    def get_logo_base64(self, logo_file_path: str= None):
         """
         Function to get the logo of the electronic invoice
         """
+        if not logo_file_path:
+            return None
 
         with open(logo_file_path, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
@@ -362,69 +364,69 @@ class SRI(BaseModel):
         """
         Function to get the subtotal 0 of the electronic invoice
         """
-        return sum(
+        return round(sum(
             [
                 float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
             ]
-        )
+        ),2)
 
     def get_subtotal_12(self):
         """
         Function to get the subtotal 12 of the electronic invoice from each line item
         """
-        return sum(
+        return round(sum(
             [
                 float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
             ]
-        )
+        ),2)
 
     def get_subtotal_14(self):
         """
         Function to get the subtotal 14 of the electronic invoice
         """
-        return sum(
+        return round(sum(
             [
                 float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN
             ]
-        )
+        ), 2)
 
     def get_subtotal_no_tax(self):
         """
         Function to get the subtotal no iva of the electronic invoice
         """
-        return sum(
+        return round(sum(
             [
                 float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
             ]
-        )
+        ),2)
 
     def get_subtotal_tax_exempt(self):
         """
         Function to get the subtotal no iva of the electronic invoice
         """
-        return sum(
+        return round(sum(
             [
                 float(i.base)
                 for i in self.taxes
                 if i.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT
             ]
-        )
+        ),2)
 
     def get_total_tax(self):
         """
         Function to get the total tax of the electronic invoice
         """
-        return sum([float(i.value) for i in self.taxes])
+        return round(sum([float(i.value) for i in self.taxes]), 2)
 
-    def get_pdf(self, logo: str, authorization_date: datetime):
+    def get_pdf(self, authorization_date: datetime,  logo_file_path: str = None):
         """
         Function to get the pdf of the electronic invoice
         """
@@ -432,7 +434,7 @@ class SRI(BaseModel):
             {
                 "bill": self,
                 "authorization_date": authorization_date,
-                "logo_base64": self.get_logo_base64(logo),
+                "logo_base64": self.get_logo_base64(logo_file_path),
                 # "barcode_image": self.get_barcode_image(),
             }
         )
@@ -457,25 +459,25 @@ class SRI(BaseModel):
         """
         Function to validate the total discount
         """
-        return sum([line.discount for line in self.lines_items])
+        return round(sum([line.discount for line in self.lines_items]), 2)
 
     @property
     def total_without_tax(self):
         """
         Function to validate the total without tax
         """
-        return sum([line.price_total_without_tax for line in self.lines_items])
+        return round(sum([line.price_total_without_tax for line in self.lines_items]), 2)
 
     @property
     def total_tax(self):
         """
         Function to validate the total without tax
         """
-        return sum([line.value for line in self.taxes])
+        return round(sum([line.value for line in self.taxes]), 2)
 
     @property
     def grand_total(self):
         """
         Function to validate the grand total
         """
-        return self.total_without_tax + self.total_tax
+        return round(self.total_without_tax + self.total_tax, 2)

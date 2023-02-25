@@ -173,7 +173,7 @@ class TestSRI:
         assert bill.total_discount == 10
 
         pdf_bytes = bill.get_pdf(
-            logo="logo.png",
+            logo_file_path="logo.png",
             authorization_date=datetime.now())
 
         with open("test.pdf", "wb") as f:
