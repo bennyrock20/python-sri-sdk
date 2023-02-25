@@ -272,15 +272,15 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        path_xml = os.path.join("tmp", "x.xml")
-        with open(path_xml, "w") as f:
-            f.write(
-                etree.tostring(
-                    signed_doc, pretty_print=True, encoding="unicode", method="xml"
-                )
-            )
-
-        # return open(path_xml, "r").read()
+        # Uncomment this line to save the xml signed
+        # path_xml = os.path.join("tmp", f"{self.get_access_key()}.xml")
+        #
+        # with open(path_xml, "w") as f:
+        #     f.write(
+        #         etree.tostring(
+        #             signed_doc, pretty_print=True, encoding="unicode", method="xml"
+        #         )
+        #     )
 
         return etree.tostring(
             signed_doc, pretty_print=True, encoding="unicode", method="xml"
@@ -407,9 +407,10 @@ class SRI(BaseModel):
 
             # Create a new TaxItem object with the group's attributes and total value
             grouped_item = TaxItem(code=code, tax_percentage_code=tax_percentage_code,
-                                   additional_discount=total_additional_discount,
-                                   base=total_base,
-                                   value=total_value)
+                                   additional_discount=round(total_additional_discount, 2),
+                                   base=round(total_base, 2),
+                                   value=round(total_value, 2)
+                                   )
 
             # Add the new item to the list of grouped tax items
             grouped_tax_items.append(grouped_item)
