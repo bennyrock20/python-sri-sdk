@@ -162,10 +162,10 @@
             <span class="form-company" style="font-weight: bold;">Identificación:</span>
             <span class="form-company">{{ bill.customer_identification }}</span>
         </div>
-        <div>
-            <span class="form-company" style="font-weight: bold;">Guia de remisión:</span>
-            <span class="form-company"></span>
-        </div>
+{#        <div>#}
+{#            <span class="form-company" style="font-weight: bold;">Guia de remisión:</span>#}
+{#            <span class="form-company"></span>#}
+{#        </div>#}
     </div>
 </div>
 
@@ -291,7 +291,7 @@
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">PROPINA</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.tip }}
+                          {{ bill.tips }}
                      </td>
                 </tr>
                 <tr style="background-color: #DFE2E3;">

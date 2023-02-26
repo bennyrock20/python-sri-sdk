@@ -12,6 +12,9 @@
         <ptoEmi>{{ bill.point_emission }}</ptoEmi>
         <secuencial>{{ bill.sequential }}</secuencial>
         <dirMatriz>{{ bill.main_address }}</dirMatriz>
+        {% if bill.regimen %}
+           <contribuyenteRimpe>{{ bill.regimen  }}</contribuyenteRimpe>
+       {% endif %}
     </infoTributaria>
     <infoFactura>
         <fechaEmision>{{ fechaEmision }}</fechaEmision>

@@ -118,7 +118,7 @@ class SRI(BaseModel):
     company_address: str
     company_contribuyente_especial: str
     company_obligado_contabilidad: Literal["SI", "NO"]
-
+    regimen: Optional[str] = None
     establishment: constr(min_length=3, max_length=3)
     point_emission: constr(min_length=3, max_length=3)
     emission_date: date
@@ -272,16 +272,6 @@ class SRI(BaseModel):
             reference_uri=["#comprobante"],
         )
 
-        # Uncomment this line to save the xml signed
-        # path_xml = os.path.join("tmp", f"{self.get_access_key()}.xml")
-        #
-        # with open(path_xml, "w") as f:
-        #     f.write(
-        #         etree.tostring(
-        #             signed_doc, pretty_print=True, encoding="unicode", method="xml"
-        #         )
-        #     )
-
         return etree.tostring(
             signed_doc, pretty_print=True, encoding="unicode", method="xml"
         )
@@ -359,7 +349,7 @@ class SRI(BaseModel):
         html = loader.get_template("ride.html").render(
             {
                 "bill": self,
-                "authorization_date": authorization_date,
+                "authorization_date": authorization_date.strftime('%Y-%m-%d %H:%M:%S'),
                 "logo_base64": self.get_logo_base64(logo_file_path),
                 # "barcode_image": self.get_barcode_image(),
             }
