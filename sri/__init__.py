@@ -116,7 +116,7 @@ class SRI(BaseModel):
     company_ruc: constr(min_length=13, max_length=13)
     company_phone: Optional[str] = None
     company_address: str
-    company_contribuyente_especial: str
+    company_contribuyente_especial: Optional[str] = None # None if not applicable
     company_obligado_contabilidad: Literal["SI", "NO"]
     regimen: Optional[str] = None
     establishment: constr(min_length=3, max_length=3)

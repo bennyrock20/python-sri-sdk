@@ -19,6 +19,9 @@
     <infoFactura>
         <fechaEmision>{{ fechaEmision }}</fechaEmision>
         <dirEstablecimiento>{{ bill.company_address }}</dirEstablecimiento>
+        {% if bill.company_contribuyente_especial %}
+           <contribuyenteEspecial>{{ bill.company_contribuyente_especial  }}</contribuyenteEspecial>
+       {% endif %}
         <obligadoContabilidad>{{ bill.company_obligado_contabilidad }}</obligadoContabilidad>
         <tipoIdentificacionComprador>{{ bill.customer_identification_type.value }}</tipoIdentificacionComprador>
         <razonSocialComprador>{{bill.customer_billing_name}}</razonSocialComprador>
