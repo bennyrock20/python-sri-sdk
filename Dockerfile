@@ -9,6 +9,7 @@ RUN dnf install -y \
     python3-devel \
     gcc \
     git \
+    pango \
     && dnf clean all
 
 
