@@ -186,13 +186,13 @@
                         {{ item.quantity }}
                     </td>
                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                        {{ item.unit_price }}
+                        {{ "%.2f"|format(item.unit_price) }}
                     </td>
                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                        {{ item.discount  }}
+                        {{ "%.2f"|format(item.discount) }}
                     </td>
                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                        {{ item.price_total_without_tax }}
+                        {{ "%.2f"|format(item.price_total_without_tax) }}
                     </td>
                 </tr>
             {% endfor %}
@@ -245,54 +245,57 @@
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">SUBTOTAL 12%</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.get_subtotal_12() }}
+                         {{ "%.2f"|format(bill.get_subtotal_12()) }}
                      </td>
                 </tr>
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">SUBTOTAL 0%</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.get_subtotal_0() }}
+                          {{ "%.2f"|format(bill.get_subtotal_0()) }}
                      </td>
                 </tr>
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">SUBTOTAL NO SUJETO IVA</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.get_subtotal_no_tax() }}
+                          {{ "%.2f"|format(bill.get_subtotal_no_tax()) }}
                      </td>
                 </tr>
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">SUBTOTAL SIN IMPUESTOS</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.total_without_tax }}
+                         {{ "%.2f"|format(bill.total_without_tax) }}
                      </td>
                 </tr>
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">DESCUENTO</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.total_discount }}
+                         {{ "%.2f"|format(bill.total_discount) }}
                      </td>
                 </tr>
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">IVA</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.get_total_tax() }}
+                         {{ "%.2f"|format(bill.get_total_tax()) }}
                      </td>
                 </tr>
-                <tr>
-                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">ICE</td>
-                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          0
-                     </td>
-                </tr>
+{#                <tr>#}
+{#                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">ICE</td>#}
+{#                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">#}
+{#                          0.00#}
+{#                     </td>#}
+{#                </tr>#}
                 <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">PROPINA</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
-                          {{ bill.tips }}
+                         {{ "%.2f"|format(bill.tips) }}
                      </td>
                 </tr>
                 <tr style="background-color: #DFE2E3;">
                      <td style="text-align: center; font-size: 10px">VALOR TOTAL</td>
-                     <td style="text-align: center; font-size: 10px">{{ bill.grand_total }}</td>
+                     <td style="text-align: center; font-size: 10px">
+                         {{ "%.2f"|format(bill.grand_total) }}
+                     </td>
+
                 </tr>
             </tbody>
     </table>
