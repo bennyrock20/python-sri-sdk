@@ -68,6 +68,9 @@ class TaxItem(BaseModel):
         elif self.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN:
             return 14
 
+        elif self.tax_percentage_code == PercentageTaxCodeEnum.FIFTEEN:
+            return 15
+
         elif self.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX:
             return 0
 
@@ -116,7 +119,7 @@ class SRI(BaseModel):
     company_ruc: constr(min_length=13, max_length=13)
     company_phone: Optional[str] = None
     company_address: str
-    company_contribuyente_especial: Optional[str] = None # None if not applicable
+    company_contribuyente_especial: Optional[str] = None  # None if not applicable
     company_obligado_contabilidad: Literal["SI", "NO"]
     regimen: Optional[str] = None
     establishment: constr(min_length=3, max_length=3)
@@ -172,15 +175,15 @@ class SRI(BaseModel):
         code_number = str(self.numeric_code).zfill(8)
 
         key = (
-                str(self.emission_date.strftime("%d%m%Y"))
-                + str(self.document_type.value)
-                + str(self.company_ruc)
-                + str(self.environment.value)
-                + str(self.establishment)
-                + str(self.point_emission)
-                + str(self.sequential)
-                + str(code_number)
-                + str(self.emission_type.value)
+            str(self.emission_date.strftime("%d%m%Y"))
+            + str(self.document_type.value)
+            + str(self.company_ruc)
+            + str(self.environment.value)
+            + str(self.establishment)
+            + str(self.point_emission)
+            + str(self.sequential)
+            + str(code_number)
+            + str(self.emission_type.value)
         )
 
         digit_verifier = SRI.generate_digit_verifier(key)
@@ -200,7 +203,7 @@ class SRI(BaseModel):
 
         while x > 0:
             x = x - 1
-            number = int(key[x: x + 1])
+            number = int(key[x : x + 1])
             total = total + (number * factor)
 
             if factor == 7:
@@ -283,7 +286,9 @@ class SRI(BaseModel):
 
         client = zeep.Client(wsdl=self.__get_reception_url())
         # transform the xml to bytes
-        xml = self.get_xml_signed(certificate_file_path=certificate_file_path, password=password).encode("utf-8")
+        xml = self.get_xml_signed(
+            certificate_file_path=certificate_file_path, password=password
+        ).encode("utf-8")
 
         response = client.service.validarComprobante(xml)
 
@@ -349,7 +354,7 @@ class SRI(BaseModel):
         html = loader.get_template("ride.html").render(
             {
                 "bill": self,
-                "authorization_date": authorization_date.strftime('%Y-%m-%d %H:%M:%S'),
+                "authorization_date": authorization_date.strftime("%Y-%m-%d %H:%M:%S"),
                 "logo_base64": self.get_logo_base64(logo_file_path),
                 # "barcode_image": self.get_barcode_image(),
             }
@@ -388,19 +393,25 @@ class SRI(BaseModel):
 
         # Group the tax items by code and tax_percentage_code
         grouped_tax_items = []
-        for (code, tax_percentage_code), group in groupby(self.taxes, key=lambda x: (x.code, x.tax_percentage_code)):
+        for (code, tax_percentage_code), group in groupby(
+            self.taxes, key=lambda x: (x.code, x.tax_percentage_code)
+        ):
             # Convert the group iterator to a list and calculate the total value for the group
             group_list = list(group)
             total_value = sum(item.value for item in group_list)
             total_base = sum(item.base for item in group_list)
-            total_additional_discount = sum(item.additional_discount for item in group_list)
+            total_additional_discount = sum(
+                item.additional_discount for item in group_list
+            )
 
             # Create a new TaxItem object with the group's attributes and total value
-            grouped_item = TaxItem(code=code, tax_percentage_code=tax_percentage_code,
-                                   additional_discount=round(total_additional_discount, 2),
-                                   base=round(total_base, 2),
-                                   value=round(total_value, 2)
-                                   )
+            grouped_item = TaxItem(
+                code=code,
+                tax_percentage_code=tax_percentage_code,
+                additional_discount=round(total_additional_discount, 2),
+                base=round(total_base, 2),
+                value=round(total_value, 2),
+            )
 
             # Add the new item to the list of grouped tax items
             grouped_tax_items.append(grouped_item)
@@ -411,61 +422,91 @@ class SRI(BaseModel):
         """
         Function to get the subtotal 0 of the electronic invoice
         """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
-            ]
-        ), 2)
+        return round(
+            sum(
+                [
+                    float(i.base)
+                    for i in self.taxes
+                    if i.tax_percentage_code == PercentageTaxCodeEnum.ZERO
+                ]
+            ),
+            2,
+        )
 
     def get_subtotal_12(self):
         """
         Function to get the subtotal 12 of the electronic invoice from each line item
         """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
-            ]
-        ), 2)
+        return round(
+            sum(
+                [
+                    float(i.base)
+                    for i in self.taxes
+                    if i.tax_percentage_code == PercentageTaxCodeEnum.TWELVE
+                ]
+            ),
+            2,
+        )
+
+    def get_subtotal_15(self):
+        """
+        Function to get the subtotal 15 of the electronic invoice from each line item
+        """
+        return round(
+            sum(
+                [
+                    float(i.base)
+                    for i in self.taxes
+                    if i.tax_percentage_code == PercentageTaxCodeEnum.FIFTEEN
+                ]
+            ),
+            2,
+        )
 
     def get_subtotal_14(self):
         """
         Function to get the subtotal 14 of the electronic invoice
         """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN
-            ]
-        ), 2)
+        return round(
+            sum(
+                [
+                    float(i.base)
+                    for i in self.taxes
+                    if i.tax_percentage_code == PercentageTaxCodeEnum.FOURTEEN
+                ]
+            ),
+            2,
+        )
 
     def get_subtotal_no_tax(self):
         """
         Function to get the subtotal no iva of the electronic invoice
         """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
-            ]
-        ), 2)
+        return round(
+            sum(
+                [
+                    float(i.base)
+                    for i in self.taxes
+                    if i.tax_percentage_code == PercentageTaxCodeEnum.NO_TAX
+                ]
+            ),
+            2,
+        )
 
     def get_subtotal_tax_exempt(self):
         """
         Function to get the subtotal no iva of the electronic invoice
         """
-        return round(sum(
-            [
-                float(i.base)
-                for i in self.taxes
-                if i.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT
-            ]
-        ), 2)
+        return round(
+            sum(
+                [
+                    float(i.base)
+                    for i in self.taxes
+                    if i.tax_percentage_code == PercentageTaxCodeEnum.TAX_EXEMPT
+                ]
+            ),
+            2,
+        )
 
     def get_total_tax(self):
         """
@@ -485,7 +526,9 @@ class SRI(BaseModel):
         """
         Function to validate the total without tax
         """
-        return round(sum([line.price_total_without_tax for line in self.lines_items]), 2)
+        return round(
+            sum([line.price_total_without_tax for line in self.lines_items]), 2
+        )
 
     @property
     def total_tax(self):

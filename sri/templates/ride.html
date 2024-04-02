@@ -249,6 +249,12 @@
                      </td>
                 </tr>
                 <tr>
+                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">SUBTOTAL 15%</td>
+                     <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
+                         {{ "%.2f"|format(bill.get_subtotal_15()) }}
+                     </td>
+                </tr>
+                <tr>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">SUBTOTAL 0%</td>
                      <td style="border-bottom: 1px #DFE2E3 solid; text-align: center; font-size: 10px">
                           {{ "%.2f"|format(bill.get_subtotal_0()) }}

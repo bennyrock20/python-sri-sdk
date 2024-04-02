@@ -42,6 +42,7 @@ class PercentageTaxCodeEnum(str, Enum):
     ZERO = "0"
     TWELVE = "2"
     FOURTEEN = "3"
+    FIFTEEN = "4"
     NO_TAX = "6"
     TAX_EXEMPT = "7"
 
