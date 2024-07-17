@@ -1,6 +1,6 @@
-# SRI 
+# EC SRI 
 
-SRI provides a simple way to interact with the SRI API.
+EC SRI provides a simple way to interact with the SRI API.
 
 ## Disclaimer
 
@@ -20,10 +20,6 @@ This is not an official SDK, it is a personal project that I use in my company, 
 - [WeasyPrint](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#installation)
 
 ## Installation
-
-```shell
-pip install sri
-```
 
 ## Usage
 
